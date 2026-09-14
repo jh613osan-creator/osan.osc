@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>부서 연차 관리 (구글 시트 연동)</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background-color: #f1f3f5;
+      display: flex;
+      justify-content: center;
+    }
+    .app-layout {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 1400px;
+    }
+    .sidebar {
+      width: 240px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      height: fit-content;
+    }
+    .sidebar h3 {
+      margin-top: 0;
+      font-size: 1.1em;
+      color: #333;
+      border-bottom: 2px solid #edf2f7;
+      padding-bottom: 10px;
+    }
+    .sidebar p {
+      font-size: 0.82em;
+      color: #868e96;
+      margin-bottom: 15px;
+    }
+    .member-item {
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      background-color: #e7f5ff;
+      border: 1px solid #74c0fc;
+      border-radius: 8px;
+      color: #1971c2;
+      font-weight: 600;
+      font-size: 0.9em;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .member-item:hover {
+      background-color: #d0ebff;
+      transform: translateY(-2px);
+    }
+    .calendar-wrapper {
+      flex: 1;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .fc .fc-daygrid-day-frame {
+      min-height: 130px !important;
+    }
+    .fc-event {
+      cursor: pointer;
+      border: none !important;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+    /* 모달 공통 스타일 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 290px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .modal-box h4 { margin: 0 0 14px 0; font-size: 1em; }
+    .type-btn-group { display: flex; flex-direction: column; gap: 8px; }
+    .type-btn {
+      padding: 10px;
+      border: 1px solid #dee2e6;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: bold;
+      text-align: left;
+    }
+    .type-btn:hover { background: #f8f9fa; }
+    .btn-close {
+      margin-top: 10px;
+      width: 100%;
+      padding: 9px;
+      background: #f1f3f5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-delete {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      background: #ffe3e3;
+      color: #e03131;
+      border: 1px solid #ffa8a8;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-delete:hover { background: #ffc9c9; }
+  </style>
+</head>
+<body>
+
+  <div class="app-layout">
+    <div class="sidebar">
+      <h3>부서원 목록</h3>
+      <p>이름을 날짜 칸으로 끌어다 놓으세요.</p>
+      <div id="external-events">
+        <div class="member-item" data-name="처장님">처장님</div>
+        <div class="member-item" data-name="과장님">과장님</div>
+        <div class="member-item" data-name="이은경">이은경</div>
+        <div class="member-item" data-name="장청림">장청림</div>
+        <div class="member-item" data-name="이종학">이종학</div>
+        <div class="member-item" data-name="최혜원">최혜원</div>
+        <div class="member-item" data-name="이다인">이다인</div>
+        <div class="member-item" data-name="주한진">주한진</div>
+        <div class="member-item" data-name="한수진">한수진</div>
+        <div class="member-item" data-name="이하눌">이하눌</div>
+        <div class="member-item" data-name="김소원">김소원</div>
+        <div class="member-item" data-name="임택청">임택청</div>
+        <div class="member-item" data-name="진현정">진현정</div>
+        <div class="member-item" data-name="김예지">김예지</div>
+        <div class="member-item" data-name="최재혁">최재혁</div>
+        <div class="member-item" data-name="유지예">유지예</div>
+        <div class="member-item" data-name="이경미">이경미</div>
+        <div class="member-item" data-name="김민주">김민주</div>
+        <div class="member-item" data-name="김수경">김수경</div>
+        <div class="member-item" data-name="김규연">김규연</div>
+      </div>
+    </div>
+
+    <div class="calendar-wrapper">
+      <div id="calendar"></div>
+    </div>
+  </div>
+
+  <!-- 1. 신규 등록 모달 -->
+  <div class="modal-overlay" id="dropModal">
+    <div class="modal-box">
+      <h4 id="dropInfoText">휴가 유형 선택</h4>
+      <div class="type-btn-group">
+        <button class="type-btn" style="color: #1c7ed6;" onclick="applyLeave('연차')">연차</button>
+        <button class="type-btn" style="color: #2f9e44;" onclick="applyLeave('오전반차')">오전반차</button>
+        <button class="type-btn" style="color: #f76707;" onclick="applyLeave('오후반차')">오후반차</button>
+        <button class="type-btn" style="color: #748ffc;" onclick="applyLeave('외출/조퇴')">외출/조퇴</button>
+        <button class="type-btn" style="color: #495057;" onclick="applyLeave('출장')">출장</button>
+      </div>
+      <button class="btn-close" onclick="closeModal('dropModal')">취소</button>
+    </div>
+  </div>
+
+  <!-- 2. 일정 클릭 시 수정/삭제 모달 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h4 id="editInfoText">일정 수정 / 삭제</h4>
+      <p style="font-size:0.82em; color:#868e96; margin-top:-8px; margin-bottom:12px;">변경할 유형을 누르면 즉시 수정됩니다.</p>
+      <div class="type-btn-group">
+        <button class="type-btn" style="color: #1c7ed6;" onclick="updateLeave('연차')">연차로 변경</button>
+        <button class="type-btn" style="color: #2f9e44;" onclick="updateLeave('오전반차')">오전반차로 변경</button>
+        <button class="type-btn" style="color: #f76707;" onclick="updateLeave('오후반차')">오후반차로 변경</button>
+        <button class="type-btn" style="color: #748ffc;" onclick="updateLeave('외출/조퇴')">외출/조퇴로 변경</button>
+        <button class="type-btn" style="color: #495057;" onclick="updateLeave('출장')">출장으로 변경</button>
+      </div>
+      <button class="btn-delete" onclick="deleteLeave()">🗑️ 이 일정 삭제하기</button>
+      <button class="btn-close" onclick="closeModal('editModal')">닫기</button>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
+
+    const colorMap = {
+      '연차': '#1c7ed6',
+      '오전반차': '#2f9e44',
+      '오후반차': '#f76707',
+      '외출/조퇴': '#748ffc',
+      '출장': '#495057'
+    };
+
+    let tempDropData = null;
+    let selectedEventInfo = null; // 클릭한 이벤트 객체 보관용
+    let calendar = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const containerEl = document.getElementById('external-events');
+      const calendarEl = document.getElementById('calendar');
+
+      new FullCalendar.Draggable(containerEl, {
+        itemSelector: '.member-item',
+        eventData: function(eventEl) {
+          return {
+            title: eventEl.getAttribute('data-name'),
+            create: false
+          };
+        }
+      });
+
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ko',
+        height: 1000,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,dayGridWeek'
+        },
+        buttonText: {
+          month: '월간',
+          week: '주간'
+        },
+        editable: false,
+        droppable: true,
+
+        // 시트 데이터 불러오기
+        events: function(fetchInfo, successCallback, failureCallback) {
+          fetch(GAS_URL)
+            .then(res => res.json())
+            .then(data => {
+              const events = data.map(item => ({
+                title: `[${item.type}] ${item.name}`,
+                start: item.date,
+                allDay: true,
+                backgroundColor: colorMap[item.type] || '#1c7ed6',
+                extendedProps: {
+                  name: item.name,
+                  type: item.type,
+                  date: item.date
+                }
+              }));
+              successCallback(events);
+            })
+            .catch(err => {
+              console.error("데이터 로딩 실패:", err);
+              successCallback([]);
+            });
+        },
+
+        // 드롭 시 등록 팝업
+        drop: function(info) {
+          const memberName = info.draggedEl.getAttribute('data-name');
+          const targetDate = info.dateStr;
+
+          tempDropData = {
+            name: memberName,
+            date: targetDate
+          };
+
+          document.getElementById('dropInfoText').innerText = `${targetDate} [${memberName}]`;
+          document.getElementById('dropModal').style.display = 'flex';
+        },
+
+        // ⭐ 등록된 이벤트 클릭 시 수정/삭제 팝업 열기
+        eventClick: function(info) {
+          selectedEventInfo = info.event;
+          const props = selectedEventInfo.extendedProps;
+          
+          document.getElementById('editInfoText').innerText = `${props.date} [${props.name}] - 현재: ${props.type}`;
+          document.getElementById('editModal').style.display = 'flex';
+        }
+      });
+
+      calendar.render();
+    });
+
+    // 1. 신규 등록
+    function applyLeave(type) {
+      if (!tempDropData) return;
+
+      const payload = {
+        action: 'create',
+        date: tempDropData.date,
+        name: tempDropData.name,
+        type: type
+      };
+
+      calendar.addEvent({
+        title: `[${type}] ${tempDropData.name}`,
+        start: tempDropData.date,
+        allDay: true,
+        backgroundColor: colorMap[type] || '#1c7ed6',
+        extendedProps: {
+          name: tempDropData.name,
+          type: type,
+          date: tempDropData.date
+        }
+      });
+
+      closeModal('dropModal');
+      sendGAS(payload);
+    }
+
+    // 2. 수정 (유형 변경)
+    function updateLeave(newType) {
+      if (!selectedEventInfo) return;
+
+      const props = selectedEventInfo.extendedProps;
+      const payload = {
+        action: 'update',
+        date: props.date,
+        name: props.name,
+        oldType: props.type,
+        newType: newType
+      };
+
+      // 화면 즉시 반영
+      selectedEventInfo.setProp('title', `[${newType}] ${props.name}`);
+      selectedEventInfo.setProp('backgroundColor', colorMap[newType] || '#1c7ed6');
+      selectedEventInfo.setExtendedProp('type', newType);
+
+      closeModal('editModal');
+      sendGAS(payload);
+    }
+
+    // 3. 삭제
+    function deleteLeave() {
+      if (!selectedEventInfo) return;
+
+      const props = selectedEventInfo.extendedProps;
+      if (!confirm(`${props.date} [${props.name}] 일정을 삭제할까?`)) return;
+
+      const payload = {
+        action: 'delete',
+        date: props.date,
+        name: props.name,
+        oldType: props.type
+      };
+
+      // 화면 즉시 삭제
+      selectedEventInfo.remove();
+
+      closeModal('editModal');
+      sendGAS(payload);
+    }
+
+    // 구글 시트 비동기 전송 공통 함수
+    function sendGAS(payload) {
+      fetch(GAS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload)
+      }).catch(err => {
+        alert("구글 시트 연동 실패: " + err);
+      });
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      if (modalId === 'dropModal') tempDropData = null;
+      if (modalId === 'editModal') selectedEventInfo = null;
+    }
+  </script>
+</body>
+</html>
