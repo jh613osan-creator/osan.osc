@@ -25,33 +25,48 @@
     }
 
     /* 상단 배너 */
-    .top-banner {
+.top-banner {
       width: 100%;
-      height: 140px;
+      height: 160px; /* 그림 디테일이 잘 보이도록 높이를 살짝 확장 */
       border-radius: 12px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%),
-                  url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      border: 1px solid #edf0f2;
+      box-sizing: border-box;
+      
+      /* 그림 가장자리 흰색/아이보리 톤을 기본 배경색으로 지정 */
+      background-color: #fcfcfc;
+      
+      /* 왼쪽은 완전 불투명(#fcfcfc), 중간부터 투명해져서 오른쪽 그림이 드러남 */
+      background-image: 
+        linear-gradient(to right, #fcfcfc 0%, #fcfcfc 35%, rgba(252, 252, 252, 0.6) 60%, rgba(252, 252, 252, 0) 85%),
+        url('banner.png'); /* 이미지 파일명 */
+      
+      background-position: right center; /* 그림을 오른쪽에 배치 */
+      background-size: auto 100%; /* 세로 높이에 딱 맞추고 비율 유지 */
+      background-repeat: no-repeat;
+
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 0 20px 28px;
-      box-sizing: border-box;
+      justify-content: center;
+      padding-left: 36px;
     }
+
+    /* 그림 톤에 맞춰 텍스트를 진한 네이비/먹색으로 정돈 */
     .top-banner h1 {
-      color: #ffffff;
+      color: #1e293b;
       margin: 0;
-      font-size: 1.55em;
+      font-size: 1.6em;
       font-weight: 700;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      letter-spacing: -0.5px;
+      text-shadow: none; /* 밝은 배경이므로 그림자 제거 */
     }
     .top-banner p {
-      color: #f1f3f5;
+      color: #64748b;
       margin: 6px 0 0 0;
-      font-size: 0.88em;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      font-size: 0.9em;
+      text-shadow: none;
     }
 
     /* 주요 일정 띠 배너 */
