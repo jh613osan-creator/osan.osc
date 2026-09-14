@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>부서 연차 & 주요 일정 관리</title>
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -10,6 +11,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 24px;
+      /* 차분한 소프트 그레이 톤 배경 */
       background: #e8ecf1;
       display: flex;
       flex-direction: column;
@@ -108,7 +110,7 @@
       flex-shrink: 0;
     }
 
-    /* 주간업무 양식 다운로드 카드 */
+    /* ⭐ 주간업무 양식 다운로드 카드 스타일 */
     .weekly-download-card {
       background: #f8f9fa;
       border: 1px solid #e9ecef;
@@ -345,7 +347,7 @@
       font-weight: bold;
     }
 
-    /* 모달 */
+    /* 모달 공통 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -425,6 +427,70 @@
       font-weight: bold;
     }
     .btn-submit:hover { background: #6741d9; }
+
+    /* ⭐ 모바일 / 태블릿 반응형 스타일 */
+    @media (max-width: 1024px) {
+      body {
+        padding: 12px;
+      }
+      .main-container {
+        max-width: 100%;
+      }
+      .top-banner {
+        height: auto;
+        min-height: 120px;
+        padding: 20px 16px;
+        background-size: cover;
+      }
+      .top-banner h1 {
+        font-size: 1.25em;
+      }
+      .top-banner p {
+        font-size: 0.8em;
+      }
+      .notice-bar {
+        padding: 10px 14px;
+        font-size: 0.88em;
+      }
+
+      /* 3단을 세로 1단으로 재배치 */
+      .app-layout {
+        flex-direction: column;
+      }
+      
+      /* 모바일에서는 메인 캘린더를 가장 먼저 보이게 순서 조정 */
+      .calendar-wrapper {
+        order: 1;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+      }
+      .status-panel {
+        order: 2;
+        width: 100%;
+      }
+      .sidebar {
+        order: 3;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      /* 모바일 캘린더 높이 및 폰트 축소 방지 */
+      .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .fc .fc-toolbar-title {
+        font-size: 1.2em;
+      }
+      .fc .fc-daygrid-day-frame {
+        min-height: 85px !important;
+      }
+      .day-schedule-badge {
+        font-size: 0.7em;
+        padding: 1px 3px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -444,7 +510,7 @@
     <div class="app-layout">
       <!-- 1. 좌측 사이드바 -->
       <div class="sidebar">
-        <!-- 주간업무 양식 다운로드 버튼 -->
+        <!-- ⭐ 주간업무 양식 다운로드 버튼 -->
         <div class="weekly-download-card">
           <p>📄 이번 주 주간업무 양식</p>
           <a href="weekly_form.hwp" download class="btn-download-weekly">
