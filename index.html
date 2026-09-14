@@ -1,3 +1,8 @@
+깃허브에 올라간 index.html이 버튼 추가 전 버전이었구나!
+
+주간업무 다운로드 버튼과 우측 인원 현황판, 수채화 배너 설정이 모두 포함된 최종 index.html 전체 코드야. 깃허브 저장소에서 index.html을 열고 연필 아이콘(수정)을 눌러 전체를 덮어씌워 줘.
+HTML
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -10,7 +15,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 24px;
-      background-color: #e8ecf1;
+      background: #e8ecf1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -18,14 +23,14 @@
 
     .main-container {
       width: 100%;
-      max-width: 1560px; /* 3단 구성을 위해 살짝 확장 */
+      max-width: 1560px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
     /* 상단 배너 */
-.top-banner {
+    .top-banner {
       width: 100%;
       height: 150px;
       border-radius: 12px;
@@ -38,7 +43,7 @@
       background-color: #ffffff;
       background-image: 
         linear-gradient(to right, #ffffff 0%, #ffffff 40%, rgba(255, 255, 255, 0.7) 65%, rgba(255, 255, 255, 0) 90%),
-        url('banner.png'); /* 저장해둔 그림 파일명 */
+        url('banner.png');
       background-position: right center;
       background-size: auto 100%;
       background-repeat: no-repeat;
@@ -48,21 +53,17 @@
       justify-content: center;
       padding-left: 36px;
     }
-
-    /* 그림 톤에 맞춰 텍스트를 진한 네이비/먹색으로 정돈 */
     .top-banner h1 {
       color: #1e293b;
       margin: 0;
       font-size: 1.6em;
       font-weight: 700;
       letter-spacing: -0.5px;
-      text-shadow: none; /* 밝은 배경이므로 그림자 제거 */
     }
     .top-banner p {
       color: #64748b;
       margin: 6px 0 0 0;
       font-size: 0.9em;
-      text-shadow: none;
     }
 
     /* 주요 일정 띠 배너 */
@@ -101,7 +102,7 @@
       align-items: flex-start;
     }
 
-    /* 좌측 사이드바 */
+    /* 1. 좌측 사이드바 */
     .sidebar {
       width: 220px;
       background: #ffffff;
@@ -111,6 +112,42 @@
       border: 1px solid #edf0f2;
       flex-shrink: 0;
     }
+
+    /* 주간업무 양식 다운로드 카드 */
+    .weekly-download-card {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .weekly-download-card p {
+      margin: 0 0 8px 0;
+      font-size: 0.8em;
+      color: #495057;
+      font-weight: 600;
+    }
+    .btn-download-weekly {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #228be6;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.84em;
+      font-weight: bold;
+      padding: 9px 10px;
+      border-radius: 6px;
+      transition: all 0.15s;
+      box-shadow: 0 2px 4px rgba(34, 139, 230, 0.2);
+    }
+    .btn-download-weekly:hover {
+      background: #1c7ed6;
+      transform: translateY(-1px);
+    }
+
     .sidebar h3 {
       margin-top: 0;
       font-size: 1.05em;
@@ -118,7 +155,7 @@
       border-bottom: 2px solid #f1f3f5;
       padding-bottom: 10px;
     }
-    .sidebar p {
+    .sidebar p.hint-text {
       font-size: 0.8em;
       color: #868e96;
       margin-bottom: 14px;
@@ -141,7 +178,7 @@
       transform: translateY(-2px);
     }
 
-    /* 가운데 캘린더 */
+    /* 2. 가운데 캘린더 */
     .calendar-wrapper {
       flex: 1;
       background: #ffffff;
@@ -163,7 +200,7 @@
       font-size: 0.82em;
     }
 
-    /* ⭐ 우측 인원 현황판 스타일 */
+    /* 3. 우측 인원 현황판 */
     .status-panel {
       width: 260px;
       background: #ffffff;
@@ -175,9 +212,6 @@
       box-sizing: border-box;
     }
     .status-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       border-bottom: 2px solid #f1f3f5;
       padding-bottom: 10px;
       margin-bottom: 14px;
@@ -186,19 +220,6 @@
       margin: 0;
       font-size: 1.05em;
       color: #212529;
-    }
-    .btn-today-reset {
-      font-size: 0.75em;
-      background: #f1f3f5;
-      border: 1px solid #dee2e6;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      color: #495057;
-      font-weight: 600;
-    }
-    .btn-today-reset:hover {
-      background: #e9ecef;
     }
     .status-target-date {
       font-size: 0.86em;
@@ -211,7 +232,7 @@
       text-align: center;
     }
 
-    /* 재실 인원 대형 카드 */
+    /* 재실 인원 카드 */
     .present-card {
       background: #ebfbee;
       border: 1px solid #b2f2bb;
@@ -426,10 +447,18 @@
     </div>
 
     <div class="app-layout">
-      <!-- 1. 좌측 부서원 목록 -->
+      <!-- 1. 좌측 사이드바 -->
       <div class="sidebar">
+        <!-- 주간업무 양식 다운로드 버튼 -->
+        <div class="weekly-download-card">
+          <p>📄 이번 주 주간업무 양식</p>
+          <a href="weekly_form.hwp" download class="btn-download-weekly">
+            📥 양식 다운로드
+          </a>
+        </div>
+
         <h3>부서원 목록</h3>
-        <p>이름을 날짜 칸으로 끌어다 놓으세요.</p>
+        <p class="hint-text">이름을 날짜 칸으로 끌어다 놓으세요.</p>
         <div id="external-events">
           <div class="member-item" data-name="처장님">처장님</div>
           <div class="member-item" data-name="과장님">과장님</div>
@@ -466,7 +495,7 @@
         </div>
 
         <div class="status-target-date" id="statusTargetDate">
-          2026-09-15
+          일정 계산 중...
         </div>
 
         <!-- 현재 재실 인원 -->
@@ -476,7 +505,7 @@
           <div class="total" id="totalMemberCount">부서 총원: 20명</div>
         </div>
 
-        <!-- 부재/출장 세부 현황 -->
+        <!-- 상세 현황 -->
         <div class="status-detail-list">
           <div class="status-detail-item">
             <div class="status-detail-top">
@@ -515,7 +544,7 @@
               <span class="badge-tag" style="background: #495057;">출장</span>
               <span class="count-text" id="count-출장">0명</span>
             </div>
-            <div class="status-members" id="members-출장">-</div>        
+            <div class="status-members" id="members-출장">-</div>
           </div>
         </div>
       </div>
@@ -597,22 +626,24 @@
     let selectedDateForSchedule = null;
     let selectedScheduleToDelete = null;
     let currentSchedulesMap = {};
-    let allLeavesData = []; // 연차 전체 캐시 저장
-    let currentSelectedDate = ''; // 현재 현황판에 표시 중인 날짜
-    let totalMembersCount = 20; // 좌측 부서원 수
+    let allLeavesData = [];
+    let currentSelectedDate = '';
+    let totalMembersCount = 20;
     let calendar = null;
+
+    function getTodayString() {
+      const today = new Date();
+      return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
       const containerEl = document.getElementById('external-events');
       const calendarEl = document.getElementById('calendar');
 
-      // 부서 총원 자동 산정
       totalMembersCount = containerEl.querySelectorAll('.member-item').length;
       document.getElementById('totalMemberCount').innerText = `부서 총원: ${totalMembersCount}명`;
 
-      // 오늘 날짜 초기화
-      const today = new Date();
-      currentSelectedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      currentSelectedDate = getTodayString();
 
       new FullCalendar.Draggable(containerEl, {
         itemSelector: '.member-item',
@@ -628,6 +659,15 @@
         initialView: 'dayGridMonth',
         locale: 'ko',
         height: 1000,
+        customButtons: {
+          today: {
+            text: 'today',
+            click: function() {
+              calendar.today();
+              updateStatusPanel(getTodayString());
+            }
+          }
+        },
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
@@ -652,7 +692,6 @@
           arg.el.setAttribute('data-cell-date', dateStr);
         },
 
-        // 날짜 칸 클릭 -> 해당 날짜 인원 현황판 업데이트 + 주요 일정 등록 모달 오픈
         dateClick: function(info) {
           updateStatusPanel(info.dateStr);
 
@@ -673,8 +712,7 @@
             .then(res => res.json())
             .then(data => {
               currentSchedulesMap = {};
-              const today = new Date();
-              const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+              const todayStr = getTodayString();
               let todayNotices = [];
 
               if (data.schedules) {
@@ -699,9 +737,8 @@
 
               renderScheduleBadges();
 
-              // 연차 데이터 저장 & 렌더링
               allLeavesData = data.leaves || [];
-              updateStatusPanel(currentSelectedDate); // 우측 현황판 즉시 갱신
+              updateStatusPanel(currentSelectedDate);
 
               const leaveEvents = allLeavesData.map(item => ({
                 title: `[${item.type}] ${item.name}`,
@@ -747,18 +784,14 @@
       calendar.render();
     });
 
-    // ⭐ 우측 인원 현황판 계산 및 업데이트 로직
     function updateStatusPanel(targetDate) {
       currentSelectedDate = targetDate;
-
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const todayStr = getTodayString();
       const isToday = (targetDate === todayStr);
 
       document.getElementById('statusTargetDate').innerText = `${targetDate} ${isToday ? '(오늘)' : ''}`;
 
-      // 유형별 집계 객체 초기화
-      const counts = { '연차': [], '오전반차': [], '오후반차': [], '출장': [], '외출/조퇴': [] };
+      const counts = { '연차': [], '오전반차': [], '오후반차': [], '외출/조퇴': [], '출장': [] };
 
       allLeavesData.forEach(item => {
         if (item.date === targetDate) {
@@ -768,26 +801,16 @@
         }
       });
 
-      // 재실 제외 인원 계산 (연차, 출장 종일 제외 / 반차 및 외출은 업무시간 재실로 취급하거나 필요시 차감)
-      // 표준 재실 기준: 연차, 출장 = 완전 부재 / 오전반차 = 오후근무 / 오후반차 = 오전근무
       const outCount = counts['연차'].length + counts['출장'].length;
       const presentCount = Math.max(0, totalMembersCount - outCount);
 
       document.getElementById('presentCount').innerText = `${presentCount}명`;
 
-      // 각 유형별 수치 및 명단 표시
-      ['연차', '오전반차', '오후반차', '출장', '외출/조퇴'].forEach(type => {
+      ['연차', '오전반차', '오후반차', '외출/조퇴', '출장'].forEach(type => {
         const list = counts[type];
         document.getElementById(`count-${type}`).innerText = `${list.length}명`;
         document.getElementById(`members-${type}`).innerText = list.length > 0 ? list.join(', ') : '없음';
       });
-    }
-
-    // 오늘 날짜로 현황판 리셋
-    function resetToToday() {
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      updateStatusPanel(todayStr);
     }
 
     function renderScheduleBadges() {
@@ -834,7 +857,6 @@
         type: type
       };
 
-      // 로컬 캐시 추가 및 즉시 반영
       allLeavesData.push({ date: tempDropData.date, name: tempDropData.name, type: type });
       updateStatusPanel(currentSelectedDate);
 
@@ -865,7 +887,6 @@
         newType: newType
       };
 
-      // 로컬 캐시 수정
       const item = allLeavesData.find(d => d.date === props.date && d.name === props.name && d.type === props.type);
       if (item) item.type = newType;
       updateStatusPanel(currentSelectedDate);
@@ -890,7 +911,6 @@
         oldType: props.type
       };
 
-      // 로컬 캐시 삭제
       const idx = allLeavesData.findIndex(d => d.date === props.date && d.name === props.name && d.type === props.type);
       if (idx > -1) allLeavesData.splice(idx, 1);
       updateStatusPanel(currentSelectedDate);
