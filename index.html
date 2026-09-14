@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>부서 연차 관리 (구글 시트 연동)</title>
+  <title>부서 연차 & 주요 일정 관리</title>
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
   <style>
@@ -10,85 +10,315 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 24px;
-      background-color: #f1f3f5;
+      background-color: #f6f7f9;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
     }
+
+    .main-container {
+      width: 100%;
+      max-width: 1560px; /* 3단 구성을 위해 살짝 확장 */
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 상단 배너 */
+    .top-banner {
+      width: 100%;
+      height: 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%),
+                  url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 0 20px 28px;
+      box-sizing: border-box;
+    }
+    .top-banner h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 1.55em;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    }
+    .top-banner p {
+      color: #f1f3f5;
+      margin: 6px 0 0 0;
+      font-size: 0.88em;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    /* 주요 일정 띠 배너 */
+    .notice-bar {
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-left: 5px solid #7950f2;
+      border-radius: 8px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .notice-badge {
+      background: #f3f0ff;
+      color: #7950f2;
+      font-weight: 700;
+      font-size: 0.85em;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .notice-content {
+      color: #343a40;
+      font-size: 0.92em;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    /* 3단 레이아웃 */
     .app-layout {
       display: flex;
-      gap: 20px;
+      gap: 18px;
       width: 100%;
-      max-width: 1400px;
+      align-items: flex-start;
     }
+
+    /* 좌측 사이드바 */
     .sidebar {
-      width: 240px;
+      width: 220px;
       background: #ffffff;
-      padding: 20px;
+      padding: 18px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      height: fit-content;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #edf0f2;
+      flex-shrink: 0;
     }
     .sidebar h3 {
       margin-top: 0;
-      font-size: 1.1em;
-      color: #333;
-      border-bottom: 2px solid #edf2f7;
+      font-size: 1.05em;
+      color: #212529;
+      border-bottom: 2px solid #f1f3f5;
       padding-bottom: 10px;
     }
     .sidebar p {
-      font-size: 0.82em;
+      font-size: 0.8em;
       color: #868e96;
-      margin-bottom: 15px;
+      margin-bottom: 14px;
     }
     .member-item {
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      background-color: #e7f5ff;
-      border: 1px solid #74c0fc;
-      border-radius: 8px;
-      color: #1971c2;
+      padding: 8px 12px;
+      margin-bottom: 7px;
+      background-color: #f1f7ff;
+      border: 1px solid #bae0ff;
+      border-radius: 6px;
+      color: #0958d9;
       font-weight: 600;
-      font-size: 0.9em;
+      font-size: 0.88em;
       cursor: grab;
       user-select: none;
       transition: all 0.15s;
     }
     .member-item:hover {
-      background-color: #d0ebff;
+      background-color: #e6f4ff;
       transform: translateY(-2px);
     }
+
+    /* 가운데 캘린더 */
     .calendar-wrapper {
       flex: 1;
       background: #ffffff;
-      padding: 24px;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #edf0f2;
+      min-width: 0;
     }
     .fc .fc-daygrid-day-frame {
-      min-height: 130px !important;
+      min-height: 120px !important;
+      cursor: pointer;
     }
     .fc-event {
       cursor: pointer;
       border: none !important;
-      padding: 3px 6px;
+      padding: 2px 5px;
       border-radius: 4px;
-      font-size: 0.85em;
+      font-size: 0.82em;
     }
 
-    /* 일요일 및 공휴일 날짜 빨간색 표시 */
+    /* ⭐ 우측 인원 현황판 스타일 */
+    .status-panel {
+      width: 260px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #edf0f2;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f1f3f5;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .status-header h3 {
+      margin: 0;
+      font-size: 1.05em;
+      color: #212529;
+    }
+    .btn-today-reset {
+      font-size: 0.75em;
+      background: #f1f3f5;
+      border: 1px solid #dee2e6;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #495057;
+      font-weight: 600;
+    }
+    .btn-today-reset:hover {
+      background: #e9ecef;
+    }
+    .status-target-date {
+      font-size: 0.86em;
+      font-weight: 700;
+      color: #1971c2;
+      margin-bottom: 14px;
+      background: #e7f5ff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    /* 재실 인원 대형 카드 */
+    .present-card {
+      background: #ebfbee;
+      border: 1px solid #b2f2bb;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .present-card .label {
+      font-size: 0.82em;
+      color: #2b8a3e;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .present-card .count {
+      font-size: 1.9em;
+      font-weight: 800;
+      color: #2b8a3e;
+      line-height: 1.1;
+    }
+    .present-card .total {
+      font-size: 0.8em;
+      color: #40c057;
+      margin-top: 4px;
+    }
+
+    /* 상세 현황 리스트 */
+    .status-detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .status-detail-item {
+      border: 1px solid #f1f3f5;
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: #fafbfc;
+    }
+    .status-detail-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.86em;
+      font-weight: 600;
+    }
+    .status-detail-top .badge-tag {
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: white;
+      font-size: 0.78em;
+    }
+    .status-detail-top .count-text {
+      color: #495057;
+      font-weight: 700;
+    }
+    .status-members {
+      font-size: 0.78em;
+      color: #868e96;
+      margin-top: 6px;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    /* 날짜 헤더 줄 */
+    .fc .fc-daygrid-day-top {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 4px 8px 2px 8px !important;
+    }
+    .fc .fc-daygrid-day-number {
+      float: none !important;
+      padding: 0 !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+
+    .day-schedule-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      overflow: hidden;
+      flex: 1;
+      margin-left: 8px;
+    }
+    .day-schedule-badge {
+      font-size: 0.75em;
+      font-weight: 600;
+      color: #5f3dc4;
+      background: #f3f0ff;
+      border: 1px solid #d0bfff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: all 0.1s;
+    }
+    .day-schedule-badge:hover {
+      background: #e5dbff;
+    }
+
     .fc-day-sun .fc-daygrid-day-number,
     .holiday-date .fc-daygrid-day-number {
       color: #e03131 !important;
       font-weight: bold;
     }
-
-    /* 토요일 파란색 표시 */
     .fc-day-sat .fc-daygrid-day-number {
       color: #1c7ed6 !important;
       font-weight: bold;
     }
 
-    /* 모달 공통 스타일 */
+    /* 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -96,16 +326,18 @@
       background: rgba(0, 0, 0, 0.4);
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 10000;
     }
     .modal-box {
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      width: 290px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      padding: 22px;
+      border-radius: 12px;
+      width: 300px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      position: relative;
+      z-index: 10001;
     }
-    .modal-box h4 { margin: 0 0 14px 0; font-size: 1em; }
+    .modal-box h4 { margin: 0 0 14px 0; font-size: 1.05em; }
     .type-btn-group { display: flex; flex-direction: column; gap: 8px; }
     .type-btn {
       padding: 10px;
@@ -140,46 +372,148 @@
       font-weight: bold;
     }
     .btn-delete:hover { background: #ffc9c9; }
+
+    .schedule-input {
+      width: 100%;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 0.92em;
+      outline: none;
+    }
+    .schedule-input:focus {
+      border-color: #7950f2;
+      box-shadow: 0 0 0 3px rgba(121, 80, 242, 0.15);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 10px;
+      background: #7950f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-submit:hover { background: #6741d9; }
   </style>
 </head>
 <body>
 
-  <div class="app-layout">
-    <div class="sidebar">
-      <h3>부서원 목록</h3>
-      <p>이름을 날짜 칸으로 끌어다 놓으세요.</p>
-      <div id="external-events">
-        <div class="member-item" data-name="처장님">처장님</div>
-        <div class="member-item" data-name="과장님">과장님</div>
-        <div class="member-item" data-name="이은경">이은경</div>
-        <div class="member-item" data-name="장청림">장청림</div>
-        <div class="member-item" data-name="이종학">이종학</div>
-        <div class="member-item" data-name="최혜원">최혜원</div>
-        <div class="member-item" data-name="이다인">이다인</div>
-        <div class="member-item" data-name="주한진">주한진</div>
-        <div class="member-item" data-name="한수진">한수진</div>
-        <div class="member-item" data-name="이하눌">이하눌</div>
-        <div class="member-item" data-name="이소원">이소원</div>
-        <div class="member-item" data-name="임택청">임택청</div>
-        <div class="member-item" data-name="진현정">진현정</div>
-        <div class="member-item" data-name="김예지">김예지</div>
-        <div class="member-item" data-name="최재혁">최재혁</div>
-        <div class="member-item" data-name="유지예">유지예</div>
-        <div class="member-item" data-name="이경미">이경미</div>
-        <div class="member-item" data-name="김민주">김민주</div>
-        <div class="member-item" data-name="김수경">김수경</div>
-        <div class="member-item" data-name="김규연">김규연</div>
-      </div>
+  <div class="main-container">
+    <div class="top-banner">
+      <h1>학생취업처 부서 일정 & 연차 현황</h1>
+      <p>학생취업처, 학생상담센터, 보건실, 대학일자리플러스센터, 창업지원센터</p>
     </div>
 
-    <div class="calendar-wrapper">
-      <div id="calendar"></div>
+    <!-- 오늘의 주요 일정 띠 배너 -->
+    <div class="notice-bar">
+      <div class="notice-badge">📢 오늘의 주요 일정</div>
+      <div class="notice-content" id="todayNoticeText">일정을 불러오는 중입니다...</div>
+    </div>
+
+    <div class="app-layout">
+      <!-- 1. 좌측 부서원 목록 -->
+      <div class="sidebar">
+        <h3>부서원 목록</h3>
+        <p>이름을 날짜 칸으로 끌어다 놓으세요.</p>
+        <div id="external-events">
+          <div class="member-item" data-name="처장님">처장님</div>
+          <div class="member-item" data-name="과장님">과장님</div>
+          <div class="member-item" data-name="이은경">이은경</div>
+          <div class="member-item" data-name="장청림">장청림</div>
+          <div class="member-item" data-name="이종학">이종학</div>
+          <div class="member-item" data-name="최혜원">최혜원</div>
+          <div class="member-item" data-name="이다인">이다인</div>
+          <div class="member-item" data-name="주한진">주한진</div>
+          <div class="member-item" data-name="한수진">한수진</div>
+          <div class="member-item" data-name="이하눌">이하눌</div>
+          <div class="member-item" data-name="김소원">김소원</div>
+          <div class="member-item" data-name="임택청">임택청</div>
+          <div class="member-item" data-name="진현정">진현정</div>
+          <div class="member-item" data-name="김예지">김예지</div>
+          <div class="member-item" data-name="최재혁">최재혁</div>
+          <div class="member-item" data-name="유지예">유지예</div>
+          <div class="member-item" data-name="이경미">이경미</div>
+          <div class="member-item" data-name="김민주">김민주</div>
+          <div class="member-item" data-name="김수경">김수경</div>
+          <div class="member-item" data-name="김규연">김규연</div>
+        </div>
+      </div>
+
+      <!-- 2. 가운데 메인 캘린더 -->
+      <div class="calendar-wrapper">
+        <div id="calendar"></div>
+      </div>
+
+      <!-- 3. 우측 실시간 인원 현황판 -->
+      <div class="status-panel">
+        <div class="status-header">
+          <h3>📊 인원 현황</h3>
+        </div>
+
+        <div class="status-target-date" id="statusTargetDate">
+          2026-09-15
+        </div>
+
+        <!-- 현재 재실 인원 -->
+        <div class="present-card">
+          <div class="label">🏢 현재 재실(근무) 인원</div>
+          <div class="count" id="presentCount">--명</div>
+          <div class="total" id="totalMemberCount">부서 총원: 20명</div>
+        </div>
+
+        <!-- 부재/출장 세부 현황 -->
+        <div class="status-detail-list">
+          <div class="status-detail-item">
+            <div class="status-detail-top">
+              <span class="badge-tag" style="background: #1c7ed6;">연차</span>
+              <span class="count-text" id="count-연차">0명</span>
+            </div>
+            <div class="status-members" id="members-연차">-</div>
+          </div>
+
+          <div class="status-detail-item">
+            <div class="status-detail-top">
+              <span class="badge-tag" style="background: #2f9e44;">오전반차</span>
+              <span class="count-text" id="count-오전반차">0명</span>
+            </div>
+            <div class="status-members" id="members-오전반차">-</div>
+          </div>
+
+          <div class="status-detail-item">
+            <div class="status-detail-top">
+              <span class="badge-tag" style="background: #f76707;">오후반차</span>
+              <span class="count-text" id="count-오후반차">0명</span>
+            </div>
+            <div class="status-members" id="members-오후반차">-</div>
+          </div>
+
+          <div class="status-detail-item">
+            <div class="status-detail-top">
+              <span class="badge-tag" style="background: #748ffc;">외출/조퇴</span>
+              <span class="count-text" id="count-외출/조퇴">0명</span>
+            </div>
+            <div class="status-members" id="members-외출/조퇴">-</div>
+          </div>
+
+          <div class="status-detail-item">
+            <div class="status-detail-top">
+              <span class="badge-tag" style="background: #495057;">출장</span>
+              <span class="count-text" id="count-출장">0명</span>
+            </div>
+            <div class="status-members" id="members-출장">-</div>        
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- 1. 신규 등록 모달 -->
+  <!-- 연차 등록 모달 -->
   <div class="modal-overlay" id="dropModal">
-    <div class="modal-box">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="dropInfoText">휴가 유형 선택</h4>
       <div class="type-btn-group">
         <button class="type-btn" style="color: #1c7ed6;" onclick="applyLeave('연차')">연차</button>
@@ -192,9 +526,9 @@
     </div>
   </div>
 
-  <!-- 2. 일정 클릭 시 수정/삭제 모달 -->
+  <!-- 연차 수정/삭제 모달 -->
   <div class="modal-overlay" id="editModal">
-    <div class="modal-box">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="editInfoText">일정 수정 / 삭제</h4>
       <p style="font-size:0.82em; color:#868e96; margin-top:-8px; margin-bottom:12px;">변경할 유형을 누르면 즉시 수정됩니다.</p>
       <div class="type-btn-group">
@@ -209,37 +543,34 @@
     </div>
   </div>
 
+  <!-- 주요 일정 등록 모달 -->
+  <div class="modal-overlay" id="scheduleModal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h4 id="scheduleModalDate">📌 주요 일정 등록</h4>
+      <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 17:00 부서 생일파티" onkeydown="if(event.key==='Enter') submitSchedule()">
+      <button class="btn-submit" onclick="submitSchedule()">등록하기</button>
+      <button class="btn-close" onclick="closeModal('scheduleModal')">취소</button>
+    </div>
+  </div>
+
+  <!-- 주요 일정 삭제 모달 -->
+  <div class="modal-overlay" id="scheduleDeleteModal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h4 id="scheduleDeleteInfoText">📌 주요 일정</h4>
+      <p id="scheduleDeleteDesc" style="font-size:0.9em; color:#495057; margin-bottom:14px;"></p>
+      <button class="btn-delete" onclick="deleteSchedule()">🗑️ 이 주요 일정 삭제하기</button>
+      <button class="btn-close" onclick="closeModal('scheduleDeleteModal')">닫기</button>
+    </div>
+  </div>
+
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
-    // 2026년 ~ 2027년 2월 대한민국 공휴일 및 대체공휴일 목록
     const holidays = new Set([
-      // 2026년 공휴일
-      '2026-01-01', // 신정
-      '2026-02-16', // 설날 연휴
-      '2026-02-17', // 설날
-      '2026-02-18', // 설날 연휴
-      '2026-03-01', // 3·1절
-      '2026-03-02', // 3·1절 대체공휴일
-      '2026-05-05', // 어린이날
-      '2026-05-24', // 부처님오신날
-      '2026-05-25', // 부처님오신날 대체공휴일
-      '2026-06-06', // 현충일
-      '2026-08-15', // 광복절
-      '2026-08-17', // 광복절 대체공휴일
-      '2026-09-24', // 추석 연휴
-      '2026-09-25', // 추석
-      '2026-09-26', // 추석 연휴
-      '2026-10-03', // 개천절
-      '2026-10-05', // 개천절 대체공휴일
-      '2026-10-09', // 한글날
-      '2026-12-25', // 성탄절
-      // 2027년 1~2월 공휴일
-      '2027-01-01', // 신정
-      '2027-02-06', // 설날 연휴
-      '2027-02-07', // 설날
-      '2027-02-08', // 설날 연휴
-      '2027-02-09'  // 설날 대체공휴일
+      '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01', '2026-03-02',
+      '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15', '2026-08-17',
+      '2026-09-24', '2026-09-25', '2026-09-26', '2026-10-03', '2026-10-05', '2026-10-09',
+      '2026-12-25', '2027-01-01', '2027-02-06', '2027-02-07', '2027-02-08', '2027-02-09'
     ]);
 
     const colorMap = {
@@ -252,11 +583,25 @@
 
     let tempDropData = null;
     let selectedEventInfo = null;
+    let selectedDateForSchedule = null;
+    let selectedScheduleToDelete = null;
+    let currentSchedulesMap = {};
+    let allLeavesData = []; // 연차 전체 캐시 저장
+    let currentSelectedDate = ''; // 현재 현황판에 표시 중인 날짜
+    let totalMembersCount = 20; // 좌측 부서원 수
     let calendar = null;
 
     document.addEventListener('DOMContentLoaded', function() {
       const containerEl = document.getElementById('external-events');
       const calendarEl = document.getElementById('calendar');
+
+      // 부서 총원 자동 산정
+      totalMembersCount = containerEl.querySelectorAll('.member-item').length;
+      document.getElementById('totalMemberCount').innerText = `부서 총원: ${totalMembersCount}명`;
+
+      // 오늘 날짜 초기화
+      const today = new Date();
+      currentSelectedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
       new FullCalendar.Draggable(containerEl, {
         itemSelector: '.member-item',
@@ -284,7 +629,6 @@
         editable: false,
         droppable: true,
 
-        // 날짜 칸 렌더링 시 공휴일 체크 및 클래스 추가
         dayCellDidMount: function(arg) {
           const year = arg.date.getFullYear();
           const month = String(arg.date.getMonth() + 1).padStart(2, '0');
@@ -294,14 +638,61 @@
           if (holidays.has(dateStr)) {
             arg.el.classList.add('holiday-date');
           }
+          arg.el.setAttribute('data-cell-date', dateStr);
         },
 
-        // 시트 데이터 불러오기
+        // 날짜 칸 클릭 -> 해당 날짜 인원 현황판 업데이트 + 주요 일정 등록 모달 오픈
+        dateClick: function(info) {
+          updateStatusPanel(info.dateStr);
+
+          selectedDateForSchedule = info.dateStr;
+          document.getElementById('scheduleModalDate').innerText = `📌 [${info.dateStr}] 주요 일정 등록`;
+          const inputEl = document.getElementById('scheduleContentInput');
+          inputEl.value = '';
+          document.getElementById('scheduleModal').style.display = 'flex';
+          setTimeout(() => inputEl.focus(), 50);
+        },
+
+        datesSet: function() {
+          setTimeout(renderScheduleBadges, 50);
+        },
+
         events: function(fetchInfo, successCallback, failureCallback) {
           fetch(GAS_URL)
             .then(res => res.json())
             .then(data => {
-              const events = data.map(item => ({
+              currentSchedulesMap = {};
+              const today = new Date();
+              const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+              let todayNotices = [];
+
+              if (data.schedules) {
+                data.schedules.forEach(item => {
+                  if (!currentSchedulesMap[item.date]) {
+                    currentSchedulesMap[item.date] = [];
+                  }
+                  currentSchedulesMap[item.date].push(item.content);
+
+                  if (item.date === todayStr) {
+                    todayNotices.push(item.content);
+                  }
+                });
+              }
+
+              const noticeEl = document.getElementById('todayNoticeText');
+              if (todayNotices.length > 0) {
+                noticeEl.innerHTML = `<strong>${todayStr}</strong> : ${todayNotices.join(' | ')}`;
+              } else {
+                noticeEl.innerHTML = `<strong>${todayStr}</strong> : 오늘 등록된 부서 주요 일정이 없습니다.`;
+              }
+
+              renderScheduleBadges();
+
+              // 연차 데이터 저장 & 렌더링
+              allLeavesData = data.leaves || [];
+              updateStatusPanel(currentSelectedDate); // 우측 현황판 즉시 갱신
+
+              const leaveEvents = allLeavesData.map(item => ({
                 title: `[${item.type}] ${item.name}`,
                 start: item.date,
                 allDay: true,
@@ -312,7 +703,8 @@
                   date: item.date
                 }
               }));
-              successCallback(events);
+
+              successCallback(leaveEvents);
             })
             .catch(err => {
               console.error("데이터 로딩 실패:", err);
@@ -320,7 +712,6 @@
             });
         },
 
-        // 드롭 시 등록 팝업
         drop: function(info) {
           const memberName = info.draggedEl.getAttribute('data-name');
           const targetDate = info.dateStr;
@@ -334,11 +725,9 @@
           document.getElementById('dropModal').style.display = 'flex';
         },
 
-        // 등록된 이벤트 클릭 시 수정/삭제 팝업 열기
         eventClick: function(info) {
           selectedEventInfo = info.event;
           const props = selectedEventInfo.extendedProps;
-          
           document.getElementById('editInfoText').innerText = `${props.date} [${props.name}] - 현재: ${props.type}`;
           document.getElementById('editModal').style.display = 'flex';
         }
@@ -347,16 +736,96 @@
       calendar.render();
     });
 
-    // 1. 신규 등록
+    // ⭐ 우측 인원 현황판 계산 및 업데이트 로직
+    function updateStatusPanel(targetDate) {
+      currentSelectedDate = targetDate;
+
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const isToday = (targetDate === todayStr);
+
+      document.getElementById('statusTargetDate').innerText = `${targetDate} ${isToday ? '(오늘)' : ''}`;
+
+      // 유형별 집계 객체 초기화
+      const counts = { '연차': [], '오전반차': [], '오후반차': [], '출장': [], '외출/조퇴': [] };
+
+      allLeavesData.forEach(item => {
+        if (item.date === targetDate) {
+          if (counts[item.type]) {
+            counts[item.type].push(item.name);
+          }
+        }
+      });
+
+      // 재실 제외 인원 계산 (연차, 출장 종일 제외 / 반차 및 외출은 업무시간 재실로 취급하거나 필요시 차감)
+      // 표준 재실 기준: 연차, 출장 = 완전 부재 / 오전반차 = 오후근무 / 오후반차 = 오전근무
+      const outCount = counts['연차'].length + counts['출장'].length;
+      const presentCount = Math.max(0, totalMembersCount - outCount);
+
+      document.getElementById('presentCount').innerText = `${presentCount}명`;
+
+      // 각 유형별 수치 및 명단 표시
+      ['연차', '오전반차', '오후반차', '출장', '외출/조퇴'].forEach(type => {
+        const list = counts[type];
+        document.getElementById(`count-${type}`).innerText = `${list.length}명`;
+        document.getElementById(`members-${type}`).innerText = list.length > 0 ? list.join(', ') : '없음';
+      });
+    }
+
+    // 오늘 날짜로 현황판 리셋
+    function resetToToday() {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      updateStatusPanel(todayStr);
+    }
+
+    function renderScheduleBadges() {
+      document.querySelectorAll('.day-schedule-container').forEach(el => el.remove());
+
+      Object.keys(currentSchedulesMap).forEach(dateStr => {
+        const cell = document.querySelector(`.fc-daygrid-day[data-date="${dateStr}"]`);
+        if (!cell) return;
+
+        const dayTop = cell.querySelector('.fc-daygrid-day-top');
+        if (!dayTop) return;
+
+        const container = document.createElement('div');
+        container.className = 'day-schedule-container';
+
+        const list = currentSchedulesMap[dateStr];
+        list.forEach(content => {
+          const badge = document.createElement('div');
+          badge.className = 'day-schedule-badge';
+          badge.title = content;
+          badge.innerText = `📌 ${content}`;
+
+          badge.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectedScheduleToDelete = { date: dateStr, content: content };
+            document.getElementById('scheduleDeleteInfoText').innerText = `📌 [${dateStr}] 주요 일정`;
+            document.getElementById('scheduleDeleteDesc').innerText = `내용: ${content}`;
+            document.getElementById('scheduleDeleteModal').style.display = 'flex';
+          });
+
+          container.appendChild(badge);
+        });
+
+        dayTop.appendChild(container);
+      });
+    }
+
     function applyLeave(type) {
       if (!tempDropData) return;
-
       const payload = {
         action: 'create',
         date: tempDropData.date,
         name: tempDropData.name,
         type: type
       };
+
+      // 로컬 캐시 추가 및 즉시 반영
+      allLeavesData.push({ date: tempDropData.date, name: tempDropData.name, type: type });
+      updateStatusPanel(currentSelectedDate);
 
       calendar.addEvent({
         title: `[${type}] ${tempDropData.name}`,
@@ -374,10 +843,8 @@
       sendGAS(payload);
     }
 
-    // 2. 수정 (유형 변경)
     function updateLeave(newType) {
       if (!selectedEventInfo) return;
-
       const props = selectedEventInfo.extendedProps;
       const payload = {
         action: 'update',
@@ -387,6 +854,11 @@
         newType: newType
       };
 
+      // 로컬 캐시 수정
+      const item = allLeavesData.find(d => d.date === props.date && d.name === props.name && d.type === props.type);
+      if (item) item.type = newType;
+      updateStatusPanel(currentSelectedDate);
+
       selectedEventInfo.setProp('title', `[${newType}] ${props.name}`);
       selectedEventInfo.setProp('backgroundColor', colorMap[newType] || '#1c7ed6');
       selectedEventInfo.setExtendedProp('type', newType);
@@ -395,10 +867,8 @@
       sendGAS(payload);
     }
 
-    // 3. 삭제
     function deleteLeave() {
       if (!selectedEventInfo) return;
-
       const props = selectedEventInfo.extendedProps;
       if (!confirm(`${props.date} [${props.name}] 일정을 삭제할까?`)) return;
 
@@ -409,12 +879,60 @@
         oldType: props.type
       };
 
+      // 로컬 캐시 삭제
+      const idx = allLeavesData.findIndex(d => d.date === props.date && d.name === props.name && d.type === props.type);
+      if (idx > -1) allLeavesData.splice(idx, 1);
+      updateStatusPanel(currentSelectedDate);
+
       selectedEventInfo.remove();
       closeModal('editModal');
       sendGAS(payload);
     }
 
-    // 구글 시트 비동기 전송
+    function submitSchedule() {
+      const inputEl = document.getElementById('scheduleContentInput');
+      const content = inputEl.value.trim();
+      if (!content) {
+        alert("일정 내용을 입력해 주세요.");
+        return;
+      }
+
+      const payload = {
+        action: 'create_schedule',
+        date: selectedDateForSchedule,
+        content: content
+      };
+
+      if (!currentSchedulesMap[selectedDateForSchedule]) {
+        currentSchedulesMap[selectedDateForSchedule] = [];
+      }
+      currentSchedulesMap[selectedDateForSchedule].push(content);
+      renderScheduleBadges();
+
+      closeModal('scheduleModal');
+      sendGAS(payload);
+    }
+
+    function deleteSchedule() {
+      if (!selectedScheduleToDelete) return;
+
+      if (!confirm(`[${selectedScheduleToDelete.content}] 주요 일정을 삭제할까?`)) return;
+
+      const payload = {
+        action: 'delete_schedule',
+        date: selectedScheduleToDelete.date,
+        content: selectedScheduleToDelete.content
+      };
+
+      const list = currentSchedulesMap[selectedScheduleToDelete.date] || [];
+      const idx = list.indexOf(selectedScheduleToDelete.content);
+      if (idx > -1) list.splice(idx, 1);
+      renderScheduleBadges();
+
+      closeModal('scheduleDeleteModal');
+      sendGAS(payload);
+    }
+
     function sendGAS(payload) {
       fetch(GAS_URL, {
         method: "POST",
@@ -430,6 +948,8 @@
       document.getElementById(modalId).style.display = 'none';
       if (modalId === 'dropModal') tempDropData = null;
       if (modalId === 'editModal') selectedEventInfo = null;
+      if (modalId === 'scheduleModal') selectedDateForSchedule = null;
+      if (modalId === 'scheduleDeleteModal') selectedScheduleToDelete = null;
     }
   </script>
 </body>
