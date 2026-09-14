@@ -74,6 +74,20 @@
       border-radius: 4px;
       font-size: 0.85em;
     }
+
+    /* 일요일 및 공휴일 날짜 빨간색 표시 */
+    .fc-day-sun .fc-daygrid-day-number,
+    .holiday-date .fc-daygrid-day-number {
+      color: #e03131 !important;
+      font-weight: bold;
+    }
+
+    /* 토요일 파란색 표시 */
+    .fc-day-sat .fc-daygrid-day-number {
+      color: #1c7ed6 !important;
+      font-weight: bold;
+    }
+
     /* 모달 공통 스타일 */
     .modal-overlay {
       display: none;
@@ -198,6 +212,36 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
+    // 2026년 ~ 2027년 2월 대한민국 공휴일 및 대체공휴일 목록
+    const holidays = new Set([
+      // 2026년 공휴일
+      '2026-01-01', // 신정
+      '2026-02-16', // 설날 연휴
+      '2026-02-17', // 설날
+      '2026-02-18', // 설날 연휴
+      '2026-03-01', // 3·1절
+      '2026-03-02', // 3·1절 대체공휴일
+      '2026-05-05', // 어린이날
+      '2026-05-24', // 부처님오신날
+      '2026-05-25', // 부처님오신날 대체공휴일
+      '2026-06-06', // 현충일
+      '2026-08-15', // 광복절
+      '2026-08-17', // 광복절 대체공휴일
+      '2026-09-24', // 추석 연휴
+      '2026-09-25', // 추석
+      '2026-09-26', // 추석 연휴
+      '2026-10-03', // 개천절
+      '2026-10-05', // 개천절 대체공휴일
+      '2026-10-09', // 한글날
+      '2026-12-25', // 성탄절
+      // 2027년 1~2월 공휴일
+      '2027-01-01', // 신정
+      '2027-02-06', // 설날 연휴
+      '2027-02-07', // 설날
+      '2027-02-08', // 설날 연휴
+      '2027-02-09'  // 설날 대체공휴일
+    ]);
+
     const colorMap = {
       '연차': '#1c7ed6',
       '오전반차': '#2f9e44',
@@ -207,7 +251,7 @@
     };
 
     let tempDropData = null;
-    let selectedEventInfo = null; // 클릭한 이벤트 객체 보관용
+    let selectedEventInfo = null;
     let calendar = null;
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -239,6 +283,18 @@
         },
         editable: false,
         droppable: true,
+
+        // 날짜 칸 렌더링 시 공휴일 체크 및 클래스 추가
+        dayCellDidMount: function(arg) {
+          const year = arg.date.getFullYear();
+          const month = String(arg.date.getMonth() + 1).padStart(2, '0');
+          const day = String(arg.date.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+
+          if (holidays.has(dateStr)) {
+            arg.el.classList.add('holiday-date');
+          }
+        },
 
         // 시트 데이터 불러오기
         events: function(fetchInfo, successCallback, failureCallback) {
@@ -278,7 +334,7 @@
           document.getElementById('dropModal').style.display = 'flex';
         },
 
-        // ⭐ 등록된 이벤트 클릭 시 수정/삭제 팝업 열기
+        // 등록된 이벤트 클릭 시 수정/삭제 팝업 열기
         eventClick: function(info) {
           selectedEventInfo = info.event;
           const props = selectedEventInfo.extendedProps;
@@ -331,7 +387,6 @@
         newType: newType
       };
 
-      // 화면 즉시 반영
       selectedEventInfo.setProp('title', `[${newType}] ${props.name}`);
       selectedEventInfo.setProp('backgroundColor', colorMap[newType] || '#1c7ed6');
       selectedEventInfo.setExtendedProp('type', newType);
@@ -354,14 +409,12 @@
         oldType: props.type
       };
 
-      // 화면 즉시 삭제
       selectedEventInfo.remove();
-
       closeModal('editModal');
       sendGAS(payload);
     }
 
-    // 구글 시트 비동기 전송 공통 함수
+    // 구글 시트 비동기 전송
     function sendGAS(payload) {
       fetch(GAS_URL, {
         method: "POST",
