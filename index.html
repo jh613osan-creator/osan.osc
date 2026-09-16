@@ -62,17 +62,26 @@
       font-size: 0.9em;
     }
 
-    /* 주요 일정 띠 배너 */
+    /* 상단 알림 및 D-Day 배너 */
     .notice-bar {
       background: #ffffff;
       border: 1px solid #e9ecef;
       border-left: 5px solid #7950f2;
       border-radius: 8px;
-      padding: 12px 20px;
+      padding: 10px 18px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      gap: 16px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      flex-wrap: wrap;
+    }
+    .notice-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 280px;
     }
     .notice-badge {
       background: #f3f0ff;
@@ -87,7 +96,47 @@
       color: #343a40;
       font-size: 0.92em;
       font-weight: 500;
-      flex: 1;
+    }
+
+    /* D-Day 태그 */
+    .dday-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .dday-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.82em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .dday-tag {
+      background: #e03131;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.82em;
+      padding: 2px 6px;
+      border-radius: 10px;
+      letter-spacing: -0.5px;
+    }
+    .dday-tag.dday-today {
+      background: #ff6b6b;
+      animation: pulse 1.2s infinite;
+    }
+    .dday-title {
+      font-weight: 600;
+      color: #343a40;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* 3단 레이아웃 */
@@ -110,7 +159,6 @@
       box-sizing: border-box;
     }
 
-    /* 주간업무 양식 다운로드 카드 */
     .weekly-download-card {
       background: #f8f9fa;
       border: 1px solid #e9ecef;
@@ -130,7 +178,6 @@
       gap: 4px;
     }
 
-    /* 주간업무 양식 NEW 뱃지 */
     .new-badge {
       display: inline-block;
       background-color: #ff6b6b;
@@ -169,20 +216,34 @@
       transform: translateY(-1px);
     }
 
-    .sidebar h3 {
-      margin-top: 0;
+    .sidebar-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #f1f3f5;
+      padding-bottom: 8px;
+      margin-bottom: 6px;
+    }
+    .sidebar-header-row h3 {
+      margin: 0;
       font-size: 1.05em;
       color: #212529;
-      border-bottom: 2px solid #f1f3f5;
-      padding-bottom: 10px;
     }
-    .sidebar p.hint-text {
-      font-size: 0.8em;
-      color: #868e96;
-      margin-bottom: 14px;
+    .btn-reset-filter {
+      background: #edf2ff;
+      color: #3b5bdb;
+      border: 1px solid #bac8ff;
+      font-size: 0.72em;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+    .btn-reset-filter:hover {
+      background: #dbe4ff;
     }
 
-    /* 센터별 그룹핑 스타일 */
     .team-group {
       margin-bottom: 14px;
     }
@@ -191,28 +252,64 @@
       font-weight: 700;
       color: #495057;
       background: #f1f3f5;
-      padding: 4px 8px;
+      padding: 5px 8px;
       border-radius: 4px;
       margin-bottom: 6px;
       border-left: 3px solid #1c7ed6;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s;
+    }
+    .team-title:hover {
+      background: #e9ecef;
+      color: #1c7ed6;
+    }
+    .team-title.active-filter {
+      background: #e7f5ff;
+      color: #1971c2;
+      border-left-color: #1971c2 !important;
+      box-shadow: 0 0 0 2px #74c0fc;
     }
 
     .member-item {
-      padding: 8px 12px;
-      margin-bottom: 7px;
+      padding: 7px 10px;
+      margin-bottom: 6px;
       background-color: #f1f7ff;
       border: 1px solid #bae0ff;
       border-radius: 6px;
       color: #0958d9;
       font-weight: 600;
-      font-size: 0.88em;
+      font-size: 0.86em;
       cursor: grab;
       user-select: none;
       transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     .member-item:hover {
       background-color: #e6f4ff;
-      transform: translateY(-2px);
+      transform: translateY(-1px);
+    }
+    .member-item.active-filter {
+      background-color: #339af0 !important;
+      color: #ffffff !important;
+      border-color: #1c7ed6 !important;
+      box-shadow: 0 2px 6px rgba(28, 126, 214, 0.35);
+    }
+
+    .fc-event.dimmed-event {
+      opacity: 0.18 !important;
+      filter: grayscale(80%) !important;
+      pointer-events: auto;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+    .fc-event.highlight-event {
+      opacity: 1 !important;
+      box-shadow: 0 0 0 2px #ff6b6b, 0 2px 6px rgba(0,0,0,0.2) !important;
+      transform: scale(1.02);
+      z-index: 10 !important;
+      transition: all 0.2s ease;
     }
 
     /* 2. 가운데 캘린더 */
@@ -236,7 +333,6 @@
       font-size: 0.82em;
     }
 
-    /* 주요 일정 카드 (일반 연차 바와 높이/마진 완벽 일치) */
     .schedule-event-card {
       border-width: 1px !important;
       border-style: solid !important;
@@ -258,7 +354,6 @@
       text-overflow: ellipsis !important;
     }
 
-    /* 일정 카테고리별 컬러 테마 */
     .sched-type-행사 {
       background: #f3f0ff !important;
       border-color: #d0bfff !important;
@@ -323,7 +418,6 @@
       text-align: center;
     }
 
-    /* 재실 인원 카드 */
     .present-card {
       background: #ebfbee;
       border: 1px solid #b2f2bb;
@@ -350,7 +444,6 @@
       margin-top: 4px;
     }
 
-    /* 상세 현황 리스트 */
     .status-detail-list {
       display: flex;
       flex-direction: column;
@@ -387,7 +480,6 @@
       word-break: keep-all;
     }
 
-    /* 날짜 헤더 줄 */
     .fc .fc-daygrid-day-top {
       display: flex !important;
       flex-direction: row !important;
@@ -402,7 +494,6 @@
       flex-shrink: 0 !important;
     }
 
-    /* 날짜 옆 미니 핀 배지 */
     .day-pin-badge {
       display: inline-flex;
       align-items: center;
@@ -417,7 +508,6 @@
       line-height: 1.2;
     }
 
-    /* ⭐ 공휴일 및 주말 글자색 (우선순위 대폭 강화) */
     .fc-day-sun .fc-daygrid-day-number,
     .holiday-date .fc-daygrid-day-number,
     .holiday-date a.fc-daygrid-day-number,
@@ -431,7 +521,7 @@
       font-weight: bold;
     }
 
-    /* 모달 공통 */
+    /* 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -487,7 +577,6 @@
     }
     .btn-delete:hover { background: #ffc9c9; }
 
-    /* 주요 일정 등록 유형 선택 그리드 */
     .schedule-category-select {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -538,7 +627,6 @@
     }
     .btn-submit:hover { background: #6741d9; }
 
-    /* 모바일 반응형 */
     @media (max-width: 1024px) {
       body { padding: 12px; }
       .main-container { max-width: 100%; }
@@ -550,7 +638,8 @@
       }
       .top-banner h1 { font-size: 1.25em; }
       .top-banner p { font-size: 0.8em; }
-      .notice-bar { padding: 10px 14px; font-size: 0.88em; }
+      .notice-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .dday-wrapper { width: 100%; justify-content: flex-start; padding-top: 4px; border-top: 1px dashed #edf0f2; }
       .app-layout { flex-direction: column; }
       .calendar-wrapper { order: 1; width: 100%; box-sizing: border-box; padding: 12px; }
       .status-panel { order: 2; width: 100%; }
@@ -566,13 +655,16 @@
   <div class="main-container">
     <div class="top-banner">
       <h1>학생취업처 부서 일정 & 연차 현황</h1>
-      <p>학생취업처, 학생상담센터, 보건실, 대학일자리플러스센터, 취창업지원센터</p>
+      <p>학생취업처, 대학일자리플러스센터, 창업지원센터, 학생상담센터, 보건실</p>
     </div>
 
-    <!-- 오늘의 주요 일정 띠 배너 -->
+    <!-- 상단 알림 및 D-Day -->
     <div class="notice-bar">
-      <div class="notice-badge">📢 오늘의 주요 일정</div>
-      <div class="notice-content" id="todayNoticeText">일정을 불러오는 중입니다...</div>
+      <div class="notice-left">
+        <div class="notice-badge">📢 오늘의 주요 일정</div>
+        <div class="notice-content" id="todayNoticeText">일정을 불러오는 중입니다...</div>
+      </div>
+      <div class="dday-wrapper" id="ddayContainer"></div>
     </div>
 
     <div class="app-layout">
@@ -588,53 +680,55 @@
           </a>
         </div>
 
-        <h3>부서원 목록</h3>
-        <p class="hint-text">이름을 날짜 칸으로 끌어다 놓으세요.</p>
+        <div class="sidebar-header-row">
+          <h3>부서원 목록</h3>
+          <button type="button" id="resetFilterBtn" class="btn-reset-filter" onclick="clearHighlightFilter()"></button>
+        </div>
 
         <div id="external-events">
           <!-- 학생취업처 -->
           <div class="team-group">
-            <div class="team-title">학생취업처</div>
-            <div class="member-item" data-name="처장님">처장님</div>
-            <div class="member-item" data-name="과장님">과장님</div>
-            <div class="member-item" data-name="이은경">이은경</div>
-            <div class="member-item" data-name="장청림">장청림</div>
-            <div class="member-item" data-name="이종학">이종학</div>
-            <div class="member-item" data-name="최혜원">최혜원</div>
-            <div class="member-item" data-name="이다인">이다인</div>
-            <div class="member-item" data-name="주한진">주한진</div>
+            <div class="team-title" data-team="학생취업처" onclick="toggleTeamFilter('학생취업처')">학생취업처</div>
+            <div class="member-item" data-name="처장님" data-team="학생취업처">처장님</div>
+            <div class="member-item" data-name="과장님" data-team="학생취업처">과장님</div>
+            <div class="member-item" data-name="이은경" data-team="학생취업처">이은경</div>
+            <div class="member-item" data-name="장청림" data-team="학생취업처">장청림</div>
+            <div class="member-item" data-name="이종학" data-team="학생취업처">이종학</div>
+            <div class="member-item" data-name="최혜원" data-team="학생취업처">최혜원</div>
+            <div class="member-item" data-name="이다인" data-team="학생취업처">이다인</div>
+            <div class="member-item" data-name="주한진" data-team="학생취업처">주한진</div>
           </div>
 
           <!-- 대학일자리플러스센터 -->
           <div class="team-group">
-            <div class="team-title" style="border-left-color: #2f9e44;">대학일자리플러스센터</div>
-            <div class="member-item" data-name="진현정">진현정</div>
-            <div class="member-item" data-name="김예지">김예지</div>
-            <div class="member-item" data-name="최재혁">최재혁</div>
-            <div class="member-item" data-name="유지예">유지예</div>
-            <div class="member-item" data-name="이경미">이경미</div>
+            <div class="team-title" data-team="대학일자리플러스센터" style="border-left-color: #2f9e44;" onclick="toggleTeamFilter('대학일자리플러스센터')">대학일자리플러스센터</div>
+            <div class="member-item" data-name="진현정" data-team="대학일자리플러스센터">진현정</div>
+            <div class="member-item" data-name="김예지" data-team="대학일자리플러스센터">김예지</div>
+            <div class="member-item" data-name="최재혁" data-team="대학일자리플러스센터">최재혁</div>
+            <div class="member-item" data-name="유지예" data-team="대학일자리플러스센터">유지예</div>
+            <div class="member-item" data-name="이경미" data-team="대학일자리플러스센터">이경미</div>
           </div>
 
-          <!-- 취창업지원센터 -->
+          <!-- 창업지원센터 -->
           <div class="team-group">
-            <div class="team-title" style="border-left-color: #f76707;">취창업지원센터</div>
-            <div class="member-item" data-name="김민주">김민주</div>
-            <div class="member-item" data-name="김수경">김수경</div>
-            <div class="member-item" data-name="김규연">김규연</div>
+            <div class="team-title" data-team="창업지원센터" style="border-left-color: #f76707;" onclick="toggleTeamFilter('업지원센터')">업지원센터</div>
+            <div class="member-item" data-name="김민주" data-team="취창업지원센터">김민주</div>
+            <div class="member-item" data-name="김수경" data-team="취창업지원센터">김수경</div>
+            <div class="member-item" data-name="김규연" data-team="취창업지원센터">김규연</div>
           </div>
 
           <!-- 학생상담센터 -->
           <div class="team-group">
-            <div class="team-title" style="border-left-color: #7950f2;">학생상담센터</div>
-            <div class="member-item" data-name="한수진">한수진</div>
-            <div class="member-item" data-name="이하눌">이하눌</div>
-            <div class="member-item" data-name="이소원">이소원</div>
+            <div class="team-title" data-team="학생상담센터" style="border-left-color: #7950f2;" onclick="toggleTeamFilter('학생상담센터')">학생상담센터</div>
+            <div class="member-item" data-name="한수진" data-team="학생상담센터">한수진</div>
+            <div class="member-item" data-name="이하눌" data-team="학생상담센터">이하눌</div>
+            <div class="member-item" data-name="이소원" data-team="학생상담센터">이소원</div>
           </div>
 
           <!-- 보건실 -->
           <div class="team-group">
-            <div class="team-title" style="border-left-color: #e03131;">보건실</div>
-            <div class="member-item" data-name="임택청">임택청</div>
+            <div class="team-title" data-team="보건실" style="border-left-color: #e03131;" onclick="toggleTeamFilter('보건실')">보건실</div>
+            <div class="member-item" data-name="임택청" data-team="보건실">임택청</div>
           </div>
         </div>
       </div>
@@ -654,14 +748,12 @@
           일정 계산 중...
         </div>
 
-        <!-- 현재 재실 인원 -->
         <div class="present-card">
           <div class="label">🏢 현재 재실(근무) 인원</div>
           <div class="count" id="presentCount">--명</div>
           <div class="total" id="totalMemberCount">부서 총원: 20명</div>
         </div>
 
-        <!-- 상세 현황 -->
         <div class="status-detail-list">
           <div class="status-detail-item">
             <div class="status-detail-top">
@@ -744,7 +836,6 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="scheduleModalDate">📌 주요 일정 등록</h4>
       
-      <!-- 유형 선택 버튼 4종 -->
       <div class="schedule-category-select">
         <button type="button" class="cat-btn active" data-cat="행사" style="color: #5f3dc4;" onclick="selectCategory('행사')">🎉 부서행사/회식</button>
         <button type="button" class="cat-btn" data-cat="회의" style="color: #3b5bdb;" onclick="selectCategory('회의')">💬 부서회의</button>
@@ -752,7 +843,7 @@
         <button type="button" class="cat-btn" data-cat="학사" style="color: #2b8a3e;" onclick="selectCategory('학사')">🏫 학사/교내</button>
       </div>
 
-      <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 17:00 생일파티" onkeydown="if(event.key==='Enter') submitSchedule()">
+      <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 10/1 축제 부스 운영" onkeydown="if(event.key==='Enter') submitSchedule()">
       <button class="btn-submit" onclick="submitSchedule()">등록하기</button>
       <button class="btn-close" onclick="closeModal('scheduleModal')">취소</button>
     </div>
@@ -771,7 +862,6 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
-    // 양식 갱신 시 이 날짜만 바꿔주면 전원에게 NEW 뱃지가 다시 뜸
     const CURRENT_WEEKLY_VERSION = "2026-09-21";
 
     const holidays = new Set([
@@ -796,12 +886,24 @@
       '학사': { icon: '🏫', name: '학사/교내' }
     };
 
+    const memberTeamMap = {
+      '처장님': '학생취업처', '과장님': '학생취업처', '이은경': '학생취업처', '장청림': '학생취업처',
+      '이종학': '학생취업처', '최혜원': '학생취업처', '이다인': '학생취업처', '주한진': '학생취업처',
+      '진현정': '대학일자리플러스센터', '김예지': '대학일자리플러스센터', '최재혁': '대학일자리플러스센터',
+      '유지예': '대학일자리플러스센터', '이경미': '대학일자리플러스센터',
+      '김민주': '취창업지원센터', '김수경': '취창업지원센터', '김규연': '취창업지원센터',
+      '한수진': '학생상담센터', '이하눌': '학생상담센터', '김소원': '학생상담센터',
+      '임택청': '보건실'
+    };
+
+    let activeFilter = null;
     let selectedCategory = '행사';
     let tempDropData = null;
     let selectedEventInfo = null;
     let selectedDateForSchedule = null;
     let selectedScheduleToDelete = null;
     let currentSchedulesMap = {};
+    let rawSchedulesList = [];
     let allLeavesData = [];
     let currentSelectedDate = '';
     let totalMembersCount = 20;
@@ -823,7 +925,6 @@
       });
     }
 
-    // ⭐ 공휴일 빨간색 강제 적용 함수 (달 넘길 때마다 재실행)
     function applyHolidayColors() {
       document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
         const dateStr = cell.getAttribute('data-date');
@@ -838,7 +939,6 @@
       });
     }
 
-    // 주간업무 양식 NEW 뱃지 체크
     function checkWeeklyFormVersion() {
       const badgeEl = document.getElementById('weeklyNewBadge');
       const btnEl = document.getElementById('weeklyDownloadBtn');
@@ -858,6 +958,132 @@
       });
     }
 
+    function renderDDayBadges() {
+      const container = document.getElementById('ddayContainer');
+      container.innerHTML = '';
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const upcoming = rawSchedulesList
+        .map(item => {
+          const itemDate = new Date(item.date);
+          itemDate.setHours(0, 0, 0, 0);
+          const diffDays = Math.round((itemDate - today) / (1000 * 60 * 60 * 24));
+          return { ...item, diffDays };
+        })
+        .filter(item => item.diffDays >= 0)
+        .sort((a, b) => a.diffDays - b.diffDays);
+
+      if (upcoming.length === 0) return;
+
+      upcoming.slice(0, 2).forEach(item => {
+        let cat = '행사';
+        let cleanText = item.content;
+
+        if (item.content.startsWith('[회의]')) {
+          cat = '회의';
+          cleanText = item.content.replace('[회의]', '').trim();
+        } else if (item.content.startsWith('[마감]')) {
+          cat = '마감';
+          cleanText = item.content.replace('[마감]', '').trim();
+        } else if (item.content.startsWith('[학사]')) {
+          cat = '학사';
+          cleanText = item.content.replace('[학사]', '').trim();
+        } else if (item.content.startsWith('[행사]')) {
+          cat = '행사';
+          cleanText = item.content.replace('[행사]', '').trim();
+        }
+
+        const icon = schedCategoryMap[cat].icon;
+        const ddayText = item.diffDays === 0 ? 'D-Day' : `D-${item.diffDays}`;
+        const isToday = item.diffDays === 0;
+
+        const ddayEl = document.createElement('div');
+        ddayEl.className = 'dday-item';
+        ddayEl.title = `[${item.date}] ${cleanText}`;
+        ddayEl.innerHTML = `
+          <span class="dday-tag ${isToday ? 'dday-today' : ''}">${ddayText}</span>
+          <span class="dday-title">${icon} ${cleanText}</span>
+        `;
+        container.appendChild(ddayEl);
+      });
+    }
+
+    function toggleTeamFilter(teamName) {
+      if (activeFilter && activeFilter.type === 'team' && activeFilter.value === teamName) {
+        clearHighlightFilter();
+      } else {
+        activeFilter = { type: 'team', value: teamName };
+        applyCurrentFilterUI();
+      }
+    }
+
+    function togglePersonFilter(personName) {
+      if (activeFilter && activeFilter.type === 'person' && activeFilter.value === personName) {
+        clearHighlightFilter();
+      } else {
+        activeFilter = { type: 'person', value: personName };
+        applyCurrentFilterUI();
+      }
+    }
+
+    function clearHighlightFilter() {
+      activeFilter = null;
+      applyCurrentFilterUI();
+    }
+
+    function applyCurrentFilterUI() {
+      const resetBtn = document.getElementById('resetFilterBtn');
+
+      document.querySelectorAll('.team-title').forEach(el => {
+        el.classList.toggle('active-filter', activeFilter && activeFilter.type === 'team' && activeFilter.value === el.getAttribute('data-team'));
+      });
+
+      document.querySelectorAll('.member-item').forEach(el => {
+        el.classList.toggle('active-filter', activeFilter && activeFilter.type === 'person' && activeFilter.value === el.getAttribute('data-name'));
+      });
+
+      if (activeFilter) {
+        resetBtn.style.display = 'block';
+        resetBtn.innerText = `✕ ${activeFilter.value}`;
+      } else {
+        resetBtn.style.display = 'none';
+      }
+
+      if (!calendar) return;
+
+      const events = calendar.getEvents();
+      events.forEach(ev => {
+        const props = ev.extendedProps;
+        if (props.isSchedule) return;
+
+        let isMatch = true;
+        if (activeFilter) {
+          if (activeFilter.type === 'person') {
+            isMatch = (props.name === activeFilter.value);
+          } else if (activeFilter.type === 'team') {
+            isMatch = (memberTeamMap[props.name] === activeFilter.value);
+          }
+        }
+
+        const eventEls = document.querySelectorAll(`.fc-event`);
+        eventEls.forEach(el => {
+          if (el.innerText.includes(props.name)) {
+            if (!activeFilter) {
+              el.classList.remove('dimmed-event', 'highlight-event');
+            } else if (isMatch) {
+              el.classList.remove('dimmed-event');
+              el.classList.add('highlight-event');
+            } else {
+              el.classList.remove('highlight-event');
+              el.classList.add('dimmed-event');
+            }
+          }
+        });
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const containerEl = document.getElementById('external-events');
       const calendarEl = document.getElementById('calendar');
@@ -867,6 +1093,13 @@
 
       currentSelectedDate = getTodayString();
       checkWeeklyFormVersion();
+
+      containerEl.querySelectorAll('.member-item').forEach(el => {
+        el.addEventListener('click', function(e) {
+          const name = this.getAttribute('data-name');
+          togglePersonFilter(name);
+        });
+      });
 
       new FullCalendar.Draggable(containerEl, {
         itemSelector: '.member-item',
@@ -929,12 +1162,27 @@
         },
 
         datesSet: function() {
-          // 달 이동 시 공휴일 색상 및 뱃지 즉시 재적용
           applyHolidayColors();
           setTimeout(() => {
             applyHolidayColors();
             renderScheduleBadges();
+            applyCurrentFilterUI();
           }, 50);
+        },
+
+        eventDidMount: function(info) {
+          if (!info.event.extendedProps.isSchedule && activeFilter) {
+            const name = info.event.extendedProps.name;
+            let isMatch = false;
+            if (activeFilter.type === 'person') isMatch = (name === activeFilter.value);
+            if (activeFilter.type === 'team') isMatch = (memberTeamMap[name] === activeFilter.value);
+
+            if (isMatch) {
+              info.el.classList.add('highlight-event');
+            } else {
+              info.el.classList.add('dimmed-event');
+            }
+          }
         },
 
         events: function(fetchInfo, successCallback, failureCallback) {
@@ -942,6 +1190,7 @@
             .then(res => res.json())
             .then(data => {
               currentSchedulesMap = {};
+              rawSchedulesList = data.schedules || [];
               const todayStr = getTodayString();
               let todayNotices = [];
               let combinedEvents = [];
@@ -1003,6 +1252,7 @@
               }
 
               renderScheduleBadges();
+              renderDDayBadges();
               applyHolidayColors();
 
               allLeavesData = data.leaves || [];
@@ -1026,6 +1276,8 @@
 
               combinedEvents.push(...leaveEvents);
               successCallback(combinedEvents);
+
+              setTimeout(applyCurrentFilterUI, 50);
             })
             .catch(err => {
               console.error("데이터 로딩 실패:", err);
@@ -1162,6 +1414,7 @@
 
       closeModal('dropModal');
       sendGAS(payload);
+      setTimeout(applyCurrentFilterUI, 50);
     }
 
     function updateLeave(newType) {
@@ -1186,6 +1439,7 @@
 
       closeModal('editModal');
       sendGAS(payload);
+      setTimeout(applyCurrentFilterUI, 50);
     }
 
     function deleteLeave() {
@@ -1207,6 +1461,7 @@
       selectedEventInfo.remove();
       closeModal('editModal');
       sendGAS(payload);
+      setTimeout(applyCurrentFilterUI, 50);
     }
 
     function submitSchedule() {
@@ -1231,7 +1486,10 @@
         currentSchedulesMap[selectedDateForSchedule] = [];
       }
       currentSchedulesMap[selectedDateForSchedule].push(displayTitle);
+      rawSchedulesList.push({ date: selectedDateForSchedule, content: rawContent });
+
       renderScheduleBadges();
+      renderDDayBadges();
 
       calendar.addEvent({
         title: displayTitle,
@@ -1266,7 +1524,12 @@
       const list = currentSchedulesMap[selectedScheduleToDelete.date] || [];
       const idx = list.indexOf(selectedScheduleToDelete.displayTitle);
       if (idx > -1) list.splice(idx, 1);
+
+      const rawIdx = rawSchedulesList.findIndex(item => item.date === selectedScheduleToDelete.date && item.content === selectedScheduleToDelete.rawContent);
+      if (rawIdx > -1) rawSchedulesList.splice(rawIdx, 1);
+
       renderScheduleBadges();
+      renderDDayBadges();
 
       if (selectedScheduleToDelete.eventObj) {
         selectedScheduleToDelete.eventObj.remove();
