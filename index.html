@@ -531,6 +531,27 @@
       .fc .fc-toolbar-title { font-size: 1.2em; }
       .fc .fc-daygrid-day-frame { min-height: 85px !important; }
     }
+
+    .new-badge {
+      display: inline-block;
+      background-color: #ff6b6b;
+      color: #ffffff;
+      font-size: 0.68em;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-left: 4px;
+      vertical-align: 1px;
+      line-height: 1;
+      white-space: nowrap;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
   </style>
 </head>
 <body>
@@ -551,13 +572,17 @@
       <!-- 1. 좌측 사이드바 -->
       <div class="sidebar">
         <div class="weekly-download-card">
-          <p>📄 이번 주 주간업무 양식</p>
-          <a href="weekly_form.hwp" download class="btn-download-weekly">
+          <p>
+            📄 주간업무 양식 <span id="weeklyNewBadge" class="new-badge" style="display: none;">NEW</span>
+          </p>
+          <a href="weekly_form.hwp" download id="weeklyDownloadBtn" class="btn-download-weekly">
             📥 양식 다운로드
           </a>
         </div>
 
         <h3>부서원 목록</h3>
+        <p class="hint-text">이름을 날짜 칸으로 끌어다 놓으세요.</p>
+
         <div id="external-events">
           <!-- 학생취업처 -->
           <div class="team-group">
@@ -1230,6 +1255,34 @@
       if (modalId === 'scheduleModal') selectedDateForSchedule = null;
       if (modalId === 'scheduleDeleteModal') selectedScheduleToDelete = null;
     }
+
+// ⭐ 새 양식 올릴 때마다 이 날짜(버전)만 바꿔주면 됨!
+    const CURRENT_WEEKLY_VERSION = "2026-09-23"; 
+
+    function checkWeeklyFormVersion() {
+      const badgeEl = document.getElementById('weeklyNewBadge');
+      const btnEl = document.getElementById('weeklyDownloadBtn');
+      if (!badgeEl || !btnEl) return;
+
+      const lastSeenVersion = localStorage.getItem('last_downloaded_weekly_version');
+
+      // 저장된 버전과 다르면 NEW 표시
+      if (lastSeenVersion !== CURRENT_WEEKLY_VERSION) {
+        badgeEl.style.display = 'inline-block';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+
+      // 클릭 시 해당 버전 확인 기록 남기고 NEW 뱃지 즉시 숨김
+      btnEl.addEventListener('click', function() {
+        localStorage.setItem('last_downloaded_weekly_version', CURRENT_WEEKLY_VERSION);
+        badgeEl.style.display = 'none';
+      });
+    }
+
+    // 페이지 열릴 때 실행
+    checkWeeklyFormVersion();
+
   </script>
 </body>
 </html>
