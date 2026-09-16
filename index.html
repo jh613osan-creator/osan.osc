@@ -844,7 +844,7 @@
       calendar.render();
     });
 
-    function updateStatusPanel(targetDate) {
+function updateStatusPanel(targetDate) {
       currentSelectedDate = targetDate;
       const todayStr = getTodayString();
       const isToday = (targetDate === todayStr);
@@ -861,10 +861,31 @@
         }
       });
 
-      const outCount = counts['연차'].length + counts['출장'].length;
+      // ⭐ 14시 기준 실시간 반차 계산 반영
+      const currentHour = new Date().getHours();
+      const isBefore14 = currentHour < 14;
+
+      let halfDayOut = 0;
+      if (isToday) {
+        // 14시 이전이면 오전반차자 부재, 14시 이후면 오후반차자 부재
+        halfDayOut = isBefore14 ? counts['오전반차'].length : counts['오후반차'].length;
+      } else {
+        // 오늘이 아닌 다른 날짜를 눌렀을 땐 오전/오후 반차자 모두 부재로 계산
+        halfDayOut = counts['오전반차'].length + counts['오후반차'].length;
+      }
+
+      // 연차 + 출장 + 시간대별 반차자 제외
+      const outCount = counts['연차'].length + counts['출장'].length + halfDayOut;
       const presentCount = Math.max(0, totalMembersCount - outCount);
 
       document.getElementById('presentCount').innerText = `${presentCount}명`;
+
+      ['연차', '오전반차', '오후반차', '외출/조퇴', '출장'].forEach(type => {
+        const list = counts[type];
+        document.getElementById(`count-${type}`).innerText = `${list.length}명`;
+        document.getElementById(`members-${type}`).innerText = list.length > 0 ? list.join(', ') : '없음';
+      });
+    }
 
       ['연차', '오전반차', '오후반차', '외출/조퇴', '출장'].forEach(type => {
         const list = counts[type];
