@@ -121,10 +121,34 @@
     }
     .weekly-download-card p {
       margin: 0 0 8px 0;
-      font-size: 0.8em;
+      font-size: 0.84em;
       color: #495057;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
+
+    /* 주간업무 양식 NEW 뱃지 */
+    .new-badge {
+      display: inline-block;
+      background-color: #ff6b6b;
+      color: #ffffff;
+      font-size: 0.72em;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      line-height: 1;
+      white-space: nowrap;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
     .btn-download-weekly {
       display: flex;
       align-items: center;
@@ -212,7 +236,7 @@
       font-size: 0.82em;
     }
 
-    /* ⭐ 부서 주요 일정 카드 (연차와 수평/높이 규격 100% 일치) */
+    /* 주요 일정 카드 (일반 연차 바와 높이/마진 완벽 일치) */
     .schedule-event-card {
       border-width: 1px !important;
       border-style: solid !important;
@@ -234,7 +258,7 @@
       text-overflow: ellipsis !important;
     }
 
-    /* ⭐ 일정 유형별 컬러 테마 */
+    /* 일정 카테고리별 컬러 테마 */
     .sched-type-행사 {
       background: #f3f0ff !important;
       border-color: #d0bfff !important;
@@ -393,10 +417,14 @@
       line-height: 1.2;
     }
 
+    /* ⭐ 공휴일 및 주말 글자색 (우선순위 대폭 강화) */
     .fc-day-sun .fc-daygrid-day-number,
-    .holiday-date .fc-daygrid-day-number {
+    .holiday-date .fc-daygrid-day-number,
+    .holiday-date a.fc-daygrid-day-number,
+    .fc .holiday-date .fc-daygrid-day-top a,
+    .fc-daygrid-day.holiday-date .fc-daygrid-day-number {
       color: #e03131 !important;
-      font-weight: bold;
+      font-weight: bold !important;
     }
     .fc-day-sat .fc-daygrid-day-number {
       color: #1c7ed6 !important;
@@ -459,7 +487,7 @@
     }
     .btn-delete:hover { background: #ffc9c9; }
 
-    /* 주요 일정 등록 유형 선택 탭 */
+    /* 주요 일정 등록 유형 선택 그리드 */
     .schedule-category-select {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -531,27 +559,6 @@
       .fc .fc-toolbar-title { font-size: 1.2em; }
       .fc .fc-daygrid-day-frame { min-height: 85px !important; }
     }
-
-    .new-badge {
-      display: inline-block;
-      background-color: #ff6b6b;
-      color: #ffffff;
-      font-size: 0.68em;
-      font-weight: 800;
-      padding: 2px 5px;
-      border-radius: 4px;
-      margin-left: 4px;
-      vertical-align: 1px;
-      line-height: 1;
-      white-space: nowrap;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
   </style>
 </head>
 <body>
@@ -559,7 +566,7 @@
   <div class="main-container">
     <div class="top-banner">
       <h1>학생취업처 부서 일정 & 연차 현황</h1>
-      <p>학생취업처, 학생상담센터, 보건실, 대학일자리플러스센터, 창업지원센터</p>
+      <p>학생취업처, 학생상담센터, 보건실, 대학일자리플러스센터, 취창업지원센터</p>
     </div>
 
     <!-- 오늘의 주요 일정 띠 배너 -->
@@ -573,7 +580,8 @@
       <div class="sidebar">
         <div class="weekly-download-card">
           <p>
-            📄 주간업무 양식 <span id="weeklyNewBadge" class="new-badge" style="display: none;">NEW</span>
+            📄 주간업무 양식
+            <span id="weeklyNewBadge" class="new-badge" style="display: none;">NEW</span>
           </p>
           <a href="weekly_form.hwp" download id="weeklyDownloadBtn" class="btn-download-weekly">
             📥 양식 다운로드
@@ -581,6 +589,8 @@
         </div>
 
         <h3>부서원 목록</h3>
+        <p class="hint-text">이름을 날짜 칸으로 끌어다 놓으세요.</p>
+
         <div id="external-events">
           <!-- 학생취업처 -->
           <div class="team-group">
@@ -729,14 +739,14 @@
     </div>
   </div>
 
-  <!-- ⭐ 주요 일정 등록 모달 (유형 선택 기능 추가) -->
+  <!-- 주요 일정 등록 모달 -->
   <div class="modal-overlay" id="scheduleModal">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="scheduleModalDate">📌 주요 일정 등록</h4>
       
       <!-- 유형 선택 버튼 4종 -->
       <div class="schedule-category-select">
-        <button type="button" class="cat-btn active" data-cat="행사" style="color: #5f3dc4;" onclick="selectCategory('행사')">🎉 행사/일반</button>
+        <button type="button" class="cat-btn active" data-cat="행사" style="color: #5f3dc4;" onclick="selectCategory('행사')">🎉 부서행사/회식</button>
         <button type="button" class="cat-btn" data-cat="회의" style="color: #3b5bdb;" onclick="selectCategory('회의')">💬 부서회의</button>
         <button type="button" class="cat-btn" data-cat="마감" style="color: #e03131;" onclick="selectCategory('마감')">⏰ 마감/공문</button>
         <button type="button" class="cat-btn" data-cat="학사" style="color: #2b8a3e;" onclick="selectCategory('학사')">🏫 학사/교내</button>
@@ -761,6 +771,9 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
+    // 양식 갱신 시 이 날짜만 바꿔주면 전원에게 NEW 뱃지가 다시 뜸
+    const CURRENT_WEEKLY_VERSION = "2026-09-21";
+
     const holidays = new Set([
       '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01', '2026-03-02',
       '2026-05-05', '2026-05-24', '2026-05-25', '2026-06-06', '2026-08-15', '2026-08-17',
@@ -776,9 +789,8 @@
       '출장': '#495057'
     };
 
-    // 주요 일정 카테고리별 아이콘 매핑
     const schedCategoryMap = {
-      '행사': { icon: '🎉', name: '행사/일반' },
+      '행사': { icon: '🎉', name: '부서행사/회식' },
       '회의': { icon: '💬', name: '부서회의' },
       '마감': { icon: '⏰', name: '마감/공문' },
       '학사': { icon: '🏫', name: '학사/교내' }
@@ -800,7 +812,6 @@
       return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
 
-    // 일정 등록 모달 내 카테고리 선택
     function selectCategory(cat) {
       selectedCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -812,6 +823,41 @@
       });
     }
 
+    // ⭐ 공휴일 빨간색 강제 적용 함수 (달 넘길 때마다 재실행)
+    function applyHolidayColors() {
+      document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+        const dateStr = cell.getAttribute('data-date');
+        if (dateStr && holidays.has(dateStr)) {
+          cell.classList.add('holiday-date');
+          const numEl = cell.querySelector('.fc-daygrid-day-number');
+          if (numEl) {
+            numEl.style.setProperty('color', '#e03131', 'important');
+            numEl.style.setProperty('font-weight', 'bold', 'important');
+          }
+        }
+      });
+    }
+
+    // 주간업무 양식 NEW 뱃지 체크
+    function checkWeeklyFormVersion() {
+      const badgeEl = document.getElementById('weeklyNewBadge');
+      const btnEl = document.getElementById('weeklyDownloadBtn');
+      if (!badgeEl || !btnEl) return;
+
+      const lastSeenVersion = localStorage.getItem('last_downloaded_weekly_version');
+
+      if (lastSeenVersion !== CURRENT_WEEKLY_VERSION) {
+        badgeEl.style.display = 'inline-block';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+
+      btnEl.addEventListener('click', function() {
+        localStorage.setItem('last_downloaded_weekly_version', CURRENT_WEEKLY_VERSION);
+        badgeEl.style.display = 'none';
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const containerEl = document.getElementById('external-events');
       const calendarEl = document.getElementById('calendar');
@@ -820,6 +866,7 @@
       document.getElementById('totalMemberCount').innerText = `부서 총원: ${totalMembersCount}명`;
 
       currentSelectedDate = getTodayString();
+      checkWeeklyFormVersion();
 
       new FullCalendar.Draggable(containerEl, {
         itemSelector: '.member-item',
@@ -835,7 +882,6 @@
         initialView: 'dayGridMonth',
         locale: 'ko',
         height: 1250,
-        // 개인 연차(order: 1)가 위에 오고, 주요 일정(order: 99)이 그 바로 아래에 쌓임
         eventOrder: 'order,start',
         customButtons: {
           today: {
@@ -874,7 +920,7 @@
           updateStatusPanel(info.dateStr);
 
           selectedDateForSchedule = info.dateStr;
-          selectCategory('행사'); // 기본은 행사/일반
+          selectCategory('행사');
           document.getElementById('scheduleModalDate').innerText = `📌 [${info.dateStr}] 주요 일정 등록`;
           const inputEl = document.getElementById('scheduleContentInput');
           inputEl.value = '';
@@ -883,7 +929,12 @@
         },
 
         datesSet: function() {
-          setTimeout(renderScheduleBadges, 50);
+          // 달 이동 시 공휴일 색상 및 뱃지 즉시 재적용
+          applyHolidayColors();
+          setTimeout(() => {
+            applyHolidayColors();
+            renderScheduleBadges();
+          }, 50);
         },
 
         events: function(fetchInfo, successCallback, failureCallback) {
@@ -895,14 +946,12 @@
               let todayNotices = [];
               let combinedEvents = [];
 
-              // 1. 주요 일정 로딩
               if (data.schedules) {
                 data.schedules.forEach(item => {
                   if (!currentSchedulesMap[item.date]) {
                     currentSchedulesMap[item.date] = [];
                   }
                   
-                  // content 문자열 내부의 말머리 파싱 (예: [회의] 주간처무회의)
                   let cat = '행사';
                   let cleanContent = item.content;
 
@@ -929,7 +978,6 @@
                     todayNotices.push(displayTitle);
                   }
 
-                  // 캘린더 이벤트로 등록
                   combinedEvents.push({
                     title: displayTitle,
                     start: item.date,
@@ -955,8 +1003,8 @@
               }
 
               renderScheduleBadges();
+              applyHolidayColors();
 
-              // 2. 개인 연차 로딩
               allLeavesData = data.leaves || [];
               updateStatusPanel(currentSelectedDate);
 
@@ -1001,7 +1049,6 @@
         eventClick: function(info) {
           const props = info.event.extendedProps;
 
-          // 주요 일정 클릭 시 -> 삭제 모달
           if (props.isSchedule) {
             selectedScheduleToDelete = { 
               date: props.date, 
@@ -1015,7 +1062,6 @@
             return;
           }
 
-          // 개인 연차 클릭 시 -> 수정/삭제 모달
           selectedEventInfo = info.event;
           document.getElementById('editInfoText').innerText = `${props.date} [${props.name}] - 현재: ${props.type}`;
           document.getElementById('editModal').style.display = 'flex';
@@ -1042,7 +1088,6 @@
         }
       });
 
-      // 14시 기준 실시간 반차 계산
       const currentHour = new Date().getHours();
       const isBefore14 = currentHour < 14;
 
@@ -1065,7 +1110,6 @@
       });
     }
 
-    // 날짜 헤더 미니 핀 뱃지
     function renderScheduleBadges() {
       document.querySelectorAll('.day-pin-badge').forEach(el => el.remove());
 
@@ -1173,7 +1217,6 @@
         return;
       }
 
-      // 구글 시트 저장용 포맷: [카테고리] 내용 (기존 백엔드 수정 없이 100% 호환)
       const rawContent = `[${selectedCategory}] ${text}`;
       const icon = schedCategoryMap[selectedCategory].icon;
       const displayTitle = `${icon} ${text}`;
@@ -1253,34 +1296,6 @@
       if (modalId === 'scheduleModal') selectedDateForSchedule = null;
       if (modalId === 'scheduleDeleteModal') selectedScheduleToDelete = null;
     }
-
-// ⭐ 새 양식 올릴 때마다 이 날짜(버전)만 바꿔주면 됨!
-    const CURRENT_WEEKLY_VERSION = "2026-09-14"; 
-
-    function checkWeeklyFormVersion() {
-      const badgeEl = document.getElementById('weeklyNewBadge');
-      const btnEl = document.getElementById('weeklyDownloadBtn');
-      if (!badgeEl || !btnEl) return;
-
-      const lastSeenVersion = localStorage.getItem('last_downloaded_weekly_version');
-
-      // 저장된 버전과 다르면 NEW 표시
-      if (lastSeenVersion !== CURRENT_WEEKLY_VERSION) {
-        badgeEl.style.display = 'inline-block';
-      } else {
-        badgeEl.style.display = 'none';
-      }
-
-      // 클릭 시 해당 버전 확인 기록 남기고 NEW 뱃지 즉시 숨김
-      btnEl.addEventListener('click', function() {
-        localStorage.setItem('last_downloaded_weekly_version', CURRENT_WEEKLY_VERSION);
-        badgeEl.style.display = 'none';
-      });
-    }
-
-    // 페이지 열릴 때 실행
-    checkWeeklyFormVersion();
-
   </script>
 </body>
 </html>
