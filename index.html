@@ -107,6 +107,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       border: 1px solid #edf0f2;
       flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     /* 주간업무 양식 다운로드 카드 */
@@ -156,6 +157,22 @@
       color: #868e96;
       margin-bottom: 14px;
     }
+
+    /* 센터별 그룹핑 스타일 */
+    .team-group {
+      margin-bottom: 14px;
+    }
+    .team-title {
+      font-size: 0.78em;
+      font-weight: 700;
+      color: #495057;
+      background: #f1f3f5;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      border-left: 3px solid #1c7ed6;
+    }
+
     .member-item {
       padding: 8px 12px;
       margin-bottom: 7px;
@@ -187,13 +204,67 @@
     .fc .fc-daygrid-day-frame {
       min-height: 120px !important;
       cursor: pointer;
+      box-sizing: border-box !important;
     }
     .fc-event {
       cursor: pointer;
-      border: none !important;
-      padding: 2px 5px;
       border-radius: 4px;
       font-size: 0.82em;
+    }
+
+    /* ⭐ 부서 주요 일정 카드 (연차와 수평/높이 규격 100% 일치) */
+    .schedule-event-card {
+      border-width: 1px !important;
+      border-style: solid !important;
+      padding: 2px 5px !important;
+      margin-top: 0 !important;
+      line-height: 1.4 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.12s ease;
+    }
+    .schedule-event-card:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.97);
+    }
+    .schedule-event-card .fc-event-main,
+    .schedule-event-card .fc-event-title {
+      font-weight: 700 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* ⭐ 일정 유형별 컬러 테마 */
+    .sched-type-행사 {
+      background: #f3f0ff !important;
+      border-color: #d0bfff !important;
+    }
+    .sched-type-행사 .fc-event-main, .sched-type-행사 .fc-event-title {
+      color: #5f3dc4 !important;
+    }
+
+    .sched-type-회의 {
+      background: #edf2ff !important;
+      border-color: #bac8ff !important;
+    }
+    .sched-type-회의 .fc-event-main, .sched-type-회의 .fc-event-title {
+      color: #3b5bdb !important;
+    }
+
+    .sched-type-마감 {
+      background: #fff5f5 !important;
+      border-color: #ffc9c9 !important;
+    }
+    .sched-type-마감 .fc-event-main, .sched-type-마감 .fc-event-title {
+      color: #e03131 !important;
+    }
+
+    .sched-type-학사 {
+      background: #ebfbee !important;
+      border-color: #b2f2bb !important;
+    }
+    .sched-type-학사 .fc-event-main, .sched-type-학사 .fc-event-title {
+      color: #2b8a3e !important;
     }
 
     /* 3. 우측 인원 현황판 */
@@ -307,33 +378,19 @@
       flex-shrink: 0 !important;
     }
 
-    .day-schedule-container {
-      display: flex;
-      justify-content: flex-end;
+    /* 날짜 옆 미니 핀 배지 */
+    .day-pin-badge {
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
-      overflow: hidden;
-      flex: 1;
-      margin-left: 8px;
-    }
-    .day-schedule-badge {
+      gap: 2px;
       font-size: 0.75em;
-      font-weight: 600;
+      font-weight: 700;
       color: #5f3dc4;
       background: #f3f0ff;
       border: 1px solid #d0bfff;
-      padding: 1px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-      cursor: pointer;
-      line-height: 1.4;
-      transition: all 0.1s;
-    }
-    .day-schedule-badge:hover {
-      background: #e5dbff;
+      padding: 1px 5px;
+      border-radius: 10px;
+      line-height: 1.2;
     }
 
     .fc-day-sun .fc-daygrid-day-number,
@@ -360,10 +417,11 @@
       background: white;
       padding: 22px;
       border-radius: 12px;
-      width: 300px;
+      width: 320px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.18);
       position: relative;
       z-index: 10001;
+      box-sizing: border-box;
     }
     .modal-box h4 { margin: 0 0 14px 0; font-size: 1.05em; }
     .type-btn-group { display: flex; flex-direction: column; gap: 8px; }
@@ -400,6 +458,31 @@
       font-weight: bold;
     }
     .btn-delete:hover { background: #ffc9c9; }
+
+    /* 주요 일정 등록 유형 선택 탭 */
+    .schedule-category-select {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .cat-btn {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+      background: #f8f9fa;
+      cursor: pointer;
+      font-size: 0.84em;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.1s;
+    }
+    .cat-btn.active {
+      background: #ffffff;
+      border-color: currentColor;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
 
     .schedule-input {
       width: 100%;
@@ -447,7 +530,6 @@
       .fc .fc-toolbar { flex-direction: column; gap: 8px; }
       .fc .fc-toolbar-title { font-size: 1.2em; }
       .fc .fc-daygrid-day-frame { min-height: 85px !important; }
-      .day-schedule-badge { font-size: 0.7em; padding: 1px 3px; }
     }
   </style>
 </head>
@@ -477,27 +559,52 @@
 
         <h3>부서원 목록</h3>
         <p class="hint-text">이름을 날짜 칸으로 끌어다 놓으세요.</p>
+
         <div id="external-events">
-          <div class="member-item" data-name="처장님">처장님</div>
-          <div class="member-item" data-name="과장님">과장님</div>
-          <div class="member-item" data-name="이은경">이은경</div>
-          <div class="member-item" data-name="장청림">장청림</div>
-          <div class="member-item" data-name="이종학">이종학</div>
-          <div class="member-item" data-name="최혜원">최혜원</div>
-          <div class="member-item" data-name="이다인">이다인</div>
-          <div class="member-item" data-name="주한진">주한진</div>
-          <div class="member-item" data-name="한수진">한수진</div>
-          <div class="member-item" data-name="이하눌">이하눌</div>
-          <div class="member-item" data-name="김소원">김소원</div>
-          <div class="member-item" data-name="임택청">임택청</div>
-          <div class="member-item" data-name="진현정">진현정</div>
-          <div class="member-item" data-name="김예지">김예지</div>
-          <div class="member-item" data-name="최재혁">최재혁</div>
-          <div class="member-item" data-name="유지예">유지예</div>
-          <div class="member-item" data-name="이경미">이경미</div>
-          <div class="member-item" data-name="김민주">김민주</div>
-          <div class="member-item" data-name="김수경">김수경</div>
-          <div class="member-item" data-name="김규연">김규연</div>
+          <!-- 학생취업처 -->
+          <div class="team-group">
+            <div class="team-title">학생취업처</div>
+            <div class="member-item" data-name="처장님">처장님</div>
+            <div class="member-item" data-name="과장님">과장님</div>
+            <div class="member-item" data-name="이은경">이은경</div>
+            <div class="member-item" data-name="장청림">장청림</div>
+            <div class="member-item" data-name="이종학">이종학</div>
+            <div class="member-item" data-name="최혜원">최혜원</div>
+            <div class="member-item" data-name="이다인">이다인</div>
+            <div class="member-item" data-name="주한진">주한진</div>
+          </div>
+
+          <!-- 대학일자리플러스센터 -->
+          <div class="team-group">
+            <div class="team-title" style="border-left-color: #2f9e44;">대학일자리플러스센터</div>
+            <div class="member-item" data-name="진현정">진현정</div>
+            <div class="member-item" data-name="김예지">김예지</div>
+            <div class="member-item" data-name="최재혁">최재혁</div>
+            <div class="member-item" data-name="유지예">유지예</div>
+            <div class="member-item" data-name="이경미">이경미</div>
+          </div>
+
+          <!-- 취창업지원센터 -->
+          <div class="team-group">
+            <div class="team-title" style="border-left-color: #f76707;">취창업지원센터</div>
+            <div class="member-item" data-name="김민주">김민주</div>
+            <div class="member-item" data-name="김수경">김수경</div>
+            <div class="member-item" data-name="김규연">김규연</div>
+          </div>
+
+          <!-- 학생상담센터 -->
+          <div class="team-group">
+            <div class="team-title" style="border-left-color: #7950f2;">학생상담센터</div>
+            <div class="member-item" data-name="한수진">한수진</div>
+            <div class="member-item" data-name="이하눌">이하눌</div>
+            <div class="member-item" data-name="김소원">김소원</div>
+          </div>
+
+          <!-- 보건실 -->
+          <div class="team-group">
+            <div class="team-title" style="border-left-color: #e03131;">보건실</div>
+            <div class="member-item" data-name="임택청">임택청</div>
+          </div>
         </div>
       </div>
 
@@ -601,11 +708,20 @@
     </div>
   </div>
 
-  <!-- 주요 일정 등록 모달 -->
+  <!-- ⭐ 주요 일정 등록 모달 (유형 선택 기능 추가) -->
   <div class="modal-overlay" id="scheduleModal">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="scheduleModalDate">📌 주요 일정 등록</h4>
-      <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 17:00 부서 생일파티" onkeydown="if(event.key==='Enter') submitSchedule()">
+      
+      <!-- 유형 선택 버튼 4종 -->
+      <div class="schedule-category-select">
+        <button type="button" class="cat-btn active" data-cat="행사" style="color: #5f3dc4;" onclick="selectCategory('행사')">🎉 행사/일반</button>
+        <button type="button" class="cat-btn" data-cat="회의" style="color: #3b5bdb;" onclick="selectCategory('회의')">💬 부서회의</button>
+        <button type="button" class="cat-btn" data-cat="마감" style="color: #e03131;" onclick="selectCategory('마감')">⏰ 마감/공문</button>
+        <button type="button" class="cat-btn" data-cat="학사" style="color: #2b8a3e;" onclick="selectCategory('학사')">🏫 학사/교내</button>
+      </div>
+
+      <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 17:00 생일파티" onkeydown="if(event.key==='Enter') submitSchedule()">
       <button class="btn-submit" onclick="submitSchedule()">등록하기</button>
       <button class="btn-close" onclick="closeModal('scheduleModal')">취소</button>
     </div>
@@ -639,6 +755,15 @@
       '출장': '#495057'
     };
 
+    // 주요 일정 카테고리별 아이콘 매핑
+    const schedCategoryMap = {
+      '행사': { icon: '🎉', name: '행사/일반' },
+      '회의': { icon: '💬', name: '부서회의' },
+      '마감': { icon: '⏰', name: '마감/공문' },
+      '학사': { icon: '🏫', name: '학사/교내' }
+    };
+
+    let selectedCategory = '행사';
     let tempDropData = null;
     let selectedEventInfo = null;
     let selectedDateForSchedule = null;
@@ -652,6 +777,18 @@
     function getTodayString() {
       const today = new Date();
       return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    }
+
+    // 일정 등록 모달 내 카테고리 선택
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -676,7 +813,9 @@
       calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ko',
-        height: 1000,
+        height: 1250,
+        // 개인 연차(order: 1)가 위에 오고, 주요 일정(order: 99)이 그 바로 아래에 쌓임
+        eventOrder: 'order,start',
         customButtons: {
           today: {
             text: 'today',
@@ -714,6 +853,7 @@
           updateStatusPanel(info.dateStr);
 
           selectedDateForSchedule = info.dateStr;
+          selectCategory('행사'); // 기본은 행사/일반
           document.getElementById('scheduleModalDate').innerText = `📌 [${info.dateStr}] 주요 일정 등록`;
           const inputEl = document.getElementById('scheduleContentInput');
           inputEl.value = '';
@@ -732,17 +872,57 @@
               currentSchedulesMap = {};
               const todayStr = getTodayString();
               let todayNotices = [];
+              let combinedEvents = [];
 
+              // 1. 주요 일정 로딩
               if (data.schedules) {
                 data.schedules.forEach(item => {
                   if (!currentSchedulesMap[item.date]) {
                     currentSchedulesMap[item.date] = [];
                   }
-                  currentSchedulesMap[item.date].push(item.content);
+                  
+                  // content 문자열 내부의 말머리 파싱 (예: [회의] 주간처무회의)
+                  let cat = '행사';
+                  let cleanContent = item.content;
+
+                  if (item.content.startsWith('[회의]')) {
+                    cat = '회의';
+                    cleanContent = item.content.replace('[회의]', '').trim();
+                  } else if (item.content.startsWith('[마감]')) {
+                    cat = '마감';
+                    cleanContent = item.content.replace('[마감]', '').trim();
+                  } else if (item.content.startsWith('[학사]')) {
+                    cat = '학사';
+                    cleanContent = item.content.replace('[학사]', '').trim();
+                  } else if (item.content.startsWith('[행사]')) {
+                    cat = '행사';
+                    cleanContent = item.content.replace('[행사]', '').trim();
+                  }
+
+                  const icon = schedCategoryMap[cat].icon;
+                  const displayTitle = `${icon} ${cleanContent}`;
+
+                  currentSchedulesMap[item.date].push(displayTitle);
 
                   if (item.date === todayStr) {
-                    todayNotices.push(item.content);
+                    todayNotices.push(displayTitle);
                   }
+
+                  // 캘린더 이벤트로 등록
+                  combinedEvents.push({
+                    title: displayTitle,
+                    start: item.date,
+                    allDay: true,
+                    className: `schedule-event-card sched-type-${cat}`,
+                    extendedProps: {
+                      isSchedule: true,
+                      date: item.date,
+                      rawContent: item.content,
+                      displayTitle: displayTitle,
+                      category: cat,
+                      order: 99
+                    }
+                  });
                 });
               }
 
@@ -755,6 +935,7 @@
 
               renderScheduleBadges();
 
+              // 2. 개인 연차 로딩
               allLeavesData = data.leaves || [];
               updateStatusPanel(currentSelectedDate);
 
@@ -763,14 +944,19 @@
                 start: item.date,
                 allDay: true,
                 backgroundColor: colorMap[item.type] || '#1c7ed6',
+                borderColor: colorMap[item.type] || '#1c7ed6',
+                textColor: '#ffffff',
                 extendedProps: {
+                  isSchedule: false,
                   name: item.name,
                   type: item.type,
-                  date: item.date
+                  date: item.date,
+                  order: 1
                 }
               }));
 
-              successCallback(leaveEvents);
+              combinedEvents.push(...leaveEvents);
+              successCallback(combinedEvents);
             })
             .catch(err => {
               console.error("데이터 로딩 실패:", err);
@@ -792,8 +978,24 @@
         },
 
         eventClick: function(info) {
+          const props = info.event.extendedProps;
+
+          // 주요 일정 클릭 시 -> 삭제 모달
+          if (props.isSchedule) {
+            selectedScheduleToDelete = { 
+              date: props.date, 
+              rawContent: props.rawContent, 
+              displayTitle: props.displayTitle, 
+              eventObj: info.event 
+            };
+            document.getElementById('scheduleDeleteInfoText').innerText = `📌 [${props.date}] 주요 일정`;
+            document.getElementById('scheduleDeleteDesc').innerText = `내용: ${props.displayTitle}`;
+            document.getElementById('scheduleDeleteModal').style.display = 'flex';
+            return;
+          }
+
+          // 개인 연차 클릭 시 -> 수정/삭제 모달
           selectedEventInfo = info.event;
-          const props = selectedEventInfo.extendedProps;
           document.getElementById('editInfoText').innerText = `${props.date} [${props.name}] - 현재: ${props.type}`;
           document.getElementById('editModal').style.display = 'flex';
         }
@@ -842,38 +1044,26 @@
       });
     }
 
+    // 날짜 헤더 미니 핀 뱃지
     function renderScheduleBadges() {
-      document.querySelectorAll('.day-schedule-container').forEach(el => el.remove());
+      document.querySelectorAll('.day-pin-badge').forEach(el => el.remove());
 
       Object.keys(currentSchedulesMap).forEach(dateStr => {
+        const list = currentSchedulesMap[dateStr];
+        if (!list || list.length === 0) return;
+
         const cell = document.querySelector(`.fc-daygrid-day[data-date="${dateStr}"]`);
         if (!cell) return;
 
         const dayTop = cell.querySelector('.fc-daygrid-day-top');
         if (!dayTop) return;
 
-        const container = document.createElement('div');
-        container.className = 'day-schedule-container';
+        const badge = document.createElement('span');
+        badge.className = 'day-pin-badge';
+        badge.title = `등록된 주요 일정 ${list.length}건`;
+        badge.innerText = list.length > 1 ? `📌 ${list.length}` : `📌`;
 
-        const list = currentSchedulesMap[dateStr];
-        list.forEach(content => {
-          const badge = document.createElement('div');
-          badge.className = 'day-schedule-badge';
-          badge.title = content;
-          badge.innerText = `📌 ${content}`;
-
-          badge.addEventListener('click', function(e) {
-            e.stopPropagation();
-            selectedScheduleToDelete = { date: dateStr, content: content };
-            document.getElementById('scheduleDeleteInfoText').innerText = `📌 [${dateStr}] 주요 일정`;
-            document.getElementById('scheduleDeleteDesc').innerText = `내용: ${content}`;
-            document.getElementById('scheduleDeleteModal').style.display = 'flex';
-          });
-
-          container.appendChild(badge);
-        });
-
-        dayTop.appendChild(container);
+        dayTop.appendChild(badge);
       });
     }
 
@@ -894,10 +1084,14 @@
         start: tempDropData.date,
         allDay: true,
         backgroundColor: colorMap[type] || '#1c7ed6',
+        borderColor: colorMap[type] || '#1c7ed6',
+        textColor: '#ffffff',
         extendedProps: {
+          isSchedule: false,
           name: tempDropData.name,
           type: type,
-          date: tempDropData.date
+          date: tempDropData.date,
+          order: 1
         }
       });
 
@@ -922,6 +1116,7 @@
 
       selectedEventInfo.setProp('title', `[${newType}] ${props.name}`);
       selectedEventInfo.setProp('backgroundColor', colorMap[newType] || '#1c7ed6');
+      selectedEventInfo.setProp('borderColor', colorMap[newType] || '#1c7ed6');
       selectedEventInfo.setExtendedProp('type', newType);
 
       closeModal('editModal');
@@ -951,23 +1146,43 @@
 
     function submitSchedule() {
       const inputEl = document.getElementById('scheduleContentInput');
-      const content = inputEl.value.trim();
-      if (!content) {
+      const text = inputEl.value.trim();
+      if (!text) {
         alert("일정 내용을 입력해 주세요.");
         return;
       }
 
+      // 구글 시트 저장용 포맷: [카테고리] 내용 (기존 백엔드 수정 없이 100% 호환)
+      const rawContent = `[${selectedCategory}] ${text}`;
+      const icon = schedCategoryMap[selectedCategory].icon;
+      const displayTitle = `${icon} ${text}`;
+
       const payload = {
         action: 'create_schedule',
         date: selectedDateForSchedule,
-        content: content
+        content: rawContent
       };
 
       if (!currentSchedulesMap[selectedDateForSchedule]) {
         currentSchedulesMap[selectedDateForSchedule] = [];
       }
-      currentSchedulesMap[selectedDateForSchedule].push(content);
+      currentSchedulesMap[selectedDateForSchedule].push(displayTitle);
       renderScheduleBadges();
+
+      calendar.addEvent({
+        title: displayTitle,
+        start: selectedDateForSchedule,
+        allDay: true,
+        className: `schedule-event-card sched-type-${selectedCategory}`,
+        extendedProps: {
+          isSchedule: true,
+          date: selectedDateForSchedule,
+          rawContent: rawContent,
+          displayTitle: displayTitle,
+          category: selectedCategory,
+          order: 99
+        }
+      });
 
       closeModal('scheduleModal');
       sendGAS(payload);
@@ -976,18 +1191,24 @@
     function deleteSchedule() {
       if (!selectedScheduleToDelete) return;
 
-      if (!confirm(`[${selectedScheduleToDelete.content}] 주요 일정을 삭제할까?`)) return;
+      if (!confirm(`[${selectedScheduleToDelete.displayTitle}] 주요 일정을 삭제할까?`)) return;
 
       const payload = {
         action: 'delete_schedule',
         date: selectedScheduleToDelete.date,
-        content: selectedScheduleToDelete.content
+        content: selectedScheduleToDelete.rawContent
       };
 
       const list = currentSchedulesMap[selectedScheduleToDelete.date] || [];
-      const idx = list.indexOf(selectedScheduleToDelete.content);
+      const idx = list.indexOf(selectedScheduleToDelete.displayTitle);
       if (idx > -1) list.splice(idx, 1);
       renderScheduleBadges();
+
+      if (selectedScheduleToDelete.eventObj) {
+        selectedScheduleToDelete.eventObj.remove();
+      } else {
+        calendar.refetchEvents();
+      }
 
       closeModal('scheduleDeleteModal');
       sendGAS(payload);
