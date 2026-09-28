@@ -196,24 +196,40 @@
       100% { transform: scale(1); }
     }
 
-    .btn-download-weekly {
+.btn-download-weekly {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
+      justify-content: space-between;
+      gap: 4px;
       background: #228be6;
       color: #ffffff;
       text-decoration: none;
-      font-size: 0.84em;
+      font-size: 0.78em;         /* 폰트를 살짝 줄여서 공간 확보 */
       font-weight: bold;
-      padding: 9px 10px;
+      padding: 7px 8px;          /* 좌우 여백을 줄여서 한 줄 유지 */
       border-radius: 6px;
+      white-space: nowrap;       /* 강제 한 줄 표시 (줄바꿈 방지) */
+      box-sizing: border-box;
       transition: all 0.15s;
-      box-shadow: 0 2px 4px rgba(34, 139, 230, 0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     }
     .btn-download-weekly:hover {
-      background: #1c7ed6;
+      filter: brightness(0.92);
       transform: translateY(-1px);
+    }
+
+    /* 텍스트 영역도 줄바꿈 없이 한 줄로 */
+    .btn-download-weekly span:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* NEW 뱃지 크기도 살짝 컴팩트하게 조절 */
+    .btn-download-weekly .new-badge {
+      font-size: 0.68em;
+      padding: 2px 4px;
+      flex-shrink: 0;           /* 뱃지가 찌그러지지 않게 고정 */
     }
 
     .sidebar-header-row {
@@ -670,14 +686,30 @@
     <div class="app-layout">
       <!-- 1. 좌측 사이드바 -->
       <div class="sidebar">
-        <div class="weekly-download-card">
-          <p>
-            📄 주간업무 양식
-            <span id="weeklyNewBadge" class="new-badge" style="display: none;">NEW</span>
+<div class="weekly-download-card">
+          <p style="margin: 0 0 10px 0; font-size: 0.88em; color: #343a40; font-weight: 700; border-bottom: 1px dashed #dee2e6; padding-bottom: 6px;">
+            📄 주요 업무 양식
           </p>
-          <a href="weekly_form.hwp" download id="weeklyDownloadBtn" class="btn-download-weekly">
-            📥 양식 다운로드
-          </a>
+          
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- 1번 양식 (기존 주간업무) -->
+            <a href="weekly_form.hwp" download id="downloadBtn1" class="btn-download-weekly">
+              <span>📥 주간업무양식</span>
+              <span id="badgeFile1" class="new-badge" style="display: none;">NEW</span>
+            </a>
+
+            <!-- 2번 양식 -->
+            <a href="monthly_1.hwp" download id="downloadBtn2" class="btn-download-weekly" style="background: #3b5bdb;">
+              <span>📥 학생월간양식</span>
+              <span id="badgeFile2" class="new-badge" style="display: none;">NEW</span>
+            </a>
+
+            <!-- 3번 양식 -->
+            <a href="monthly_2.hwp" download id="downloadBtn3" class="btn-download-weekly" style="background: #20c997;">
+              <span>📥 창업월간양식</span>
+              <span id="badgeFile3" class="new-badge" style="display: none;">NEW</span>
+            </a>
+          </div>
         </div>
 
         <div class="sidebar-header-row">
@@ -862,7 +894,11 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
-    const CURRENT_WEEKLY_VERSION = "2026-09-21";
+    const FILE_VERSIONS = {
+      file1: "2026-09-21", // 주간업무 양식
+      file2: "2026-09-28", // 2번 양식
+      file3: "2026-09-28"  // 3번 양식
+    };
 
     const holidays = new Set([
       '2026-01-01', '2026-02-16', '2026-02-17', '2026-02-18', '2026-03-01', '2026-03-02',
@@ -939,25 +975,36 @@
       });
     }
 
-    function checkWeeklyFormVersion() {
-      const badgeEl = document.getElementById('weeklyNewBadge');
-      const btnEl = document.getElementById('weeklyDownloadBtn');
-      if (!badgeEl || !btnEl) return;
+function checkWeeklyFormVersion() {
+      // 3개 버튼과 뱃지를 매핑하여 처리
+      const downloadList = [
+        { id: 'file1', btn: 'downloadBtn1', badge: 'badgeFile1' },
+        { id: 'file2', btn: 'downloadBtn2', badge: 'badgeFile2' },
+        { id: 'file3', btn: 'downloadBtn3', badge: 'badgeFile3' }
+      ];
 
-      const lastSeenVersion = localStorage.getItem('last_downloaded_weekly_version');
+      downloadList.forEach(item => {
+        const btnEl = document.getElementById(item.btn);
+        const badgeEl = document.getElementById(item.badge);
+        if (!btnEl || !badgeEl) return;
 
-      if (lastSeenVersion !== CURRENT_WEEKLY_VERSION) {
-        badgeEl.style.display = 'inline-block';
-      } else {
-        badgeEl.style.display = 'none';
-      }
+        const currentVer = FILE_VERSIONS[item.id];
+        const lastSeenVer = localStorage.getItem(`last_downloaded_${item.id}`);
 
-      btnEl.addEventListener('click', function() {
-        localStorage.setItem('last_downloaded_weekly_version', CURRENT_WEEKLY_VERSION);
-        badgeEl.style.display = 'none';
+        // 버전이 다르면 NEW 뱃지 표시
+        if (lastSeenVer !== currentVer) {
+          badgeEl.style.display = 'inline-block';
+        } else {
+          badgeEl.style.display = 'none';
+        }
+
+        // 클릭 시 해당 파일의 NEW 뱃지만 사라짐
+        btnEl.addEventListener('click', function() {
+          localStorage.setItem(`last_downloaded_${item.id}`, currentVer);
+          badgeEl.style.display = 'none';
+        });
       });
     }
-
     function renderDDayBadges() {
       const container = document.getElementById('ddayContainer');
       container.innerHTML = '';
