@@ -199,16 +199,16 @@
 .btn-download-weekly {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 4px;
+      justify-content: center; /* space-between 대신 center로 중앙 정렬! */
+      gap: 6px;                /* 글자와 NEW 뱃지 사이 간격 */
       background: #228be6;
       color: #ffffff;
       text-decoration: none;
-      font-size: 0.78em;         /* 폰트를 살짝 줄여서 공간 확보 */
+      font-size: 0.78em;
       font-weight: bold;
-      padding: 7px 8px;          /* 좌우 여백을 줄여서 한 줄 유지 */
+      padding: 7px 8px;
       border-radius: 6px;
-      white-space: nowrap;       /* 강제 한 줄 표시 (줄바꿈 방지) */
+      white-space: nowrap;
       box-sizing: border-box;
       transition: all 0.15s;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
