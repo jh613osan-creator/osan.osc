@@ -6,6 +6,11 @@
   <title>부서 연차 & 주요 일정 관리</title>
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  
+  <!-- Firebase SDK (호환 버전 v8 CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -167,17 +172,6 @@
       margin-bottom: 16px;
       text-align: center;
     }
-    .weekly-download-card p {
-      margin: 0 0 8px 0;
-      font-size: 0.84em;
-      color: #495057;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
     .new-badge {
       display: inline-block;
       background-color: #ff6b6b;
@@ -196,11 +190,11 @@
       100% { transform: scale(1); }
     }
 
-.btn-download-weekly {
+    .btn-download-weekly {
       display: flex;
       align-items: center;
-      justify-content: center; /* space-between 대신 center로 중앙 정렬! */
-      gap: 6px;                /* 글자와 NEW 뱃지 사이 간격 */
+      justify-content: center;
+      gap: 6px;
       background: #228be6;
       color: #ffffff;
       text-decoration: none;
@@ -217,19 +211,10 @@
       filter: brightness(0.92);
       transform: translateY(-1px);
     }
-
-    /* 텍스트 영역도 줄바꿈 없이 한 줄로 */
     .btn-download-weekly span:first-child {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    /* NEW 뱃지 크기도 살짝 컴팩트하게 조절 */
-    .btn-download-weekly .new-badge {
-      font-size: 0.68em;
-      padding: 2px 4px;
-      flex-shrink: 0;           /* 뱃지가 찌그러지지 않게 고정 */
     }
 
     .sidebar-header-row {
@@ -256,13 +241,8 @@
       cursor: pointer;
       display: none;
     }
-    .btn-reset-filter:hover {
-      background: #dbe4ff;
-    }
 
-    .team-group {
-      margin-bottom: 14px;
-    }
+    .team-group { margin-bottom: 14px; }
     .team-title {
       font-size: 0.78em;
       font-weight: 700;
@@ -276,10 +256,7 @@
       user-select: none;
       transition: all 0.12s;
     }
-    .team-title:hover {
-      background: #e9ecef;
-      color: #1c7ed6;
-    }
+    .team-title:hover { background: #e9ecef; color: #1c7ed6; }
     .team-title.active-filter {
       background: #e7f5ff;
       color: #1971c2;
@@ -303,10 +280,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .member-item:hover {
-      background-color: #e6f4ff;
-      transform: translateY(-1px);
-    }
+    .member-item:hover { background-color: #e6f4ff; transform: translateY(-1px); }
     .member-item.active-filter {
       background-color: #339af0 !important;
       color: #ffffff !important;
@@ -318,14 +292,12 @@
       opacity: 0.18 !important;
       filter: grayscale(80%) !important;
       pointer-events: auto;
-      transition: opacity 0.2s ease, filter 0.2s ease;
     }
     .fc-event.highlight-event {
       opacity: 1 !important;
       box-shadow: 0 0 0 2px #ff6b6b, 0 2px 6px rgba(0,0,0,0.2) !important;
       transform: scale(1.02);
       z-index: 10 !important;
-      transition: all 0.2s ease;
     }
 
     /* 2. 가운데 캘린더 */
@@ -348,19 +320,12 @@
       border-radius: 4px;
       font-size: 0.82em;
     }
-
     .schedule-event-card {
       border-width: 1px !important;
       border-style: solid !important;
       padding: 2px 5px !important;
-      margin-top: 0 !important;
       line-height: 1.4 !important;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-      transition: all 0.12s ease;
-    }
-    .schedule-event-card:hover {
-      transform: translateY(-1px);
-      filter: brightness(0.97);
     }
     .schedule-event-card .fc-event-main,
     .schedule-event-card .fc-event-title {
@@ -369,54 +334,37 @@
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
+    .sched-type-행사 { background: #f3f0ff !important; border-color: #d0bfff !important; }
+    .sched-type-행사 .fc-event-main, .sched-type-행사 .fc-event-title { color: #5f3dc4 !important; }
+    .sched-type-회의 { background: #edf2ff !important; border-color: #bac8ff !important; }
+    .sched-type-회의 .fc-event-main, .sched-type-회의 .fc-event-title { color: #3b5bdb !important; }
+    .sched-type-마감 { background: #fff5f5 !important; border-color: #ffc9c9 !important; }
+    .sched-type-마감 .fc-event-main, .sched-type-마감 .fc-event-title { color: #e03131 !important; }
+    .sched-type-학사 { background: #ebfbee !important; border-color: #b2f2bb !important; }
+    .sched-type-학사 .fc-event-main, .sched-type-학사 .fc-event-title { color: #2b8a3e !important; }
 
-    .sched-type-행사 {
-      background: #f3f0ff !important;
-      border-color: #d0bfff !important;
-    }
-    .sched-type-행사 .fc-event-main, .sched-type-행사 .fc-event-title {
-      color: #5f3dc4 !important;
-    }
-
-    .sched-type-회의 {
-      background: #edf2ff !important;
-      border-color: #bac8ff !important;
-    }
-    .sched-type-회의 .fc-event-main, .sched-type-회의 .fc-event-title {
-      color: #3b5bdb !important;
-    }
-
-    .sched-type-마감 {
-      background: #fff5f5 !important;
-      border-color: #ffc9c9 !important;
-    }
-    .sched-type-마감 .fc-event-main, .sched-type-마감 .fc-event-title {
-      color: #e03131 !important;
+    /* 3. 우측 사이드 패널 컨테이너 (인원현황 + 익명채팅 + 갤러리버튼) */
+    .right-sidebar {
+      width: 270px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-shrink: 0;
     }
 
-    .sched-type-학사 {
-      background: #ebfbee !important;
-      border-color: #b2f2bb !important;
-    }
-    .sched-type-학사 .fc-event-main, .sched-type-학사 .fc-event-title {
-      color: #2b8a3e !important;
-    }
-
-    /* 3. 우측 인원 현황판 */
     .status-panel {
-      width: 260px;
+      width: 100%;
       background: #ffffff;
-      padding: 20px;
+      padding: 18px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       border: 1px solid #edf0f2;
-      flex-shrink: 0;
       box-sizing: border-box;
     }
     .status-header {
       border-bottom: 2px solid #f1f3f5;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
     }
     .status-header h3 {
       margin: 0;
@@ -424,12 +372,12 @@
       color: #212529;
     }
     .status-target-date {
-      font-size: 0.86em;
+      font-size: 0.84em;
       font-weight: 700;
       color: #1971c2;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       background: #e7f5ff;
-      padding: 6px 10px;
+      padding: 5px 8px;
       border-radius: 6px;
       text-align: center;
     }
@@ -437,63 +385,322 @@
     .present-card {
       background: #ebfbee;
       border: 1px solid #b2f2bb;
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: 8px;
+      padding: 10px;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
-    .present-card .label {
-      font-size: 0.82em;
-      color: #2b8a3e;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .present-card .count {
-      font-size: 1.9em;
-      font-weight: 800;
-      color: #2b8a3e;
-      line-height: 1.1;
-    }
-    .present-card .total {
-      font-size: 0.8em;
-      color: #40c057;
-      margin-top: 4px;
-    }
+    .present-card .label { font-size: 0.78em; color: #2b8a3e; font-weight: 600; margin-bottom: 2px; }
+    .present-card .count { font-size: 1.6em; font-weight: 800; color: #2b8a3e; line-height: 1.1; }
+    .present-card .total { font-size: 0.76em; color: #40c057; margin-top: 2px; }
 
-    .status-detail-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .status-detail-list { display: flex; flex-direction: column; gap: 8px; }
     .status-detail-item {
       border: 1px solid #f1f3f5;
-      border-radius: 8px;
-      padding: 9px 12px;
+      border-radius: 6px;
+      padding: 7px 10px;
       background: #fafbfc;
     }
     .status-detail-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.86em;
+      font-size: 0.82em;
       font-weight: 600;
     }
-    .status-detail-top .badge-tag {
+    .status-detail-top .badge-tag { padding: 2px 5px; border-radius: 4px; color: white; font-size: 0.74em; }
+    .status-detail-top .count-text { color: #495057; font-weight: 700; }
+    .status-members { font-size: 0.75em; color: #868e96; margin-top: 4px; line-height: 1.3; word-break: keep-all; }
+
+    /* 익명 채팅 위젯 (가가라이브 스타일) */
+    .chat-panel {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid #edf0f2;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 380px;
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #343a40;
+      color: #ffffff;
+      padding: 10px 14px;
+      font-size: 0.86em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-nick-badge {
+      background: #495057;
+      color: #ffd43b;
+      font-size: 0.76em;
       padding: 2px 6px;
       border-radius: 4px;
-      color: white;
-      font-size: 0.78em;
+      cursor: pointer;
     }
-    .status-detail-top .count-text {
-      color: #495057;
+    .chat-body {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #f8f9fa;
+      font-size: 0.8em;
+    }
+    .chat-msg {
+      line-height: 1.35;
+      word-break: break-all;
+    }
+    .chat-msg .time {
+      font-size: 0.72em;
+      color: #adb5bd;
+      margin-left: 4px;
+    }
+    .chat-msg .nick {
+      font-weight: 700;
+      color: #1971c2;
+    }
+    .chat-msg.is-me .nick {
+      color: #e03131;
+    }
+    .chat-input-area {
+      display: flex;
+      border-top: 1px solid #dee2e6;
+      background: #ffffff;
+    }
+    .chat-input {
+      flex: 1;
+      border: none;
+      padding: 9px 10px;
+      font-size: 0.82em;
+      outline: none;
+    }
+    .chat-send-btn {
+      background: #228be6;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 0.8em;
       font-weight: 700;
     }
-    .status-members {
+    .chat-send-btn:hover { background: #1c7ed6; }
+
+    /* 삭제 및 청소 버튼 스타일 */
+    .btn-clear-chat {
+      background: transparent;
+      border: none;
+      color: #ced4da;
+      cursor: pointer;
+      font-size: 0.9em;
+      padding: 0 4px;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .btn-clear-chat:hover {
+      color: #ff6b6b;
+    }
+    .btn-del-msg {
+      background: transparent;
+      border: none;
+      color: #adb5bd;
+      font-size: 0.72em;
+      cursor: pointer;
+      padding: 0 3px;
+      margin-left: 4px;
+      display: none;
+    }
+    .chat-msg:hover .btn-del-msg {
+      display: inline;
+    }
+    .btn-del-msg:hover {
+      color: #e03131;
+      font-weight: bold;
+    }
+
+    /* 갤러리 열기 버튼 */
+    .btn-open-gallery {
+      width: 100%;
+      background: linear-gradient(135deg, #7950f2 0%, #4c6ef5 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.92em;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(121, 80, 242, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-open-gallery:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(121, 80, 242, 0.35);
+      filter: brightness(1.05);
+    }
+
+    /* 갤러리 대형 모달 전용 스타일 */
+    .gallery-modal-box {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 960px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+      box-sizing: border-box;
+      position: relative;
+    }
+    .gallery-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #f1f3f5;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .gallery-top-bar h3 {
+      margin: 0;
+      font-size: 1.25em;
+      color: #212529;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .gallery-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-upload-pic {
+      background: #7950f2;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-upload-pic:hover { background: #6741d9; }
+    
+    .gallery-grid {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      padding-right: 4px;
+    }
+    .gallery-card {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .gallery-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    }
+    .gallery-img-wrap {
+      width: 100%;
+      height: 140px;
+      background: #f1f3f5;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .gallery-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s;
+    }
+    .gallery-img-wrap:hover img {
+      transform: scale(1.05);
+    }
+    .gallery-info {
+      padding: 8px 10px;
       font-size: 0.78em;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: #fafbfc;
+      border-top: 1px solid #f1f3f5;
+    }
+    .gallery-memo {
+      font-weight: 700;
+      color: #343a40;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gallery-meta {
       color: #868e96;
-      margin-top: 6px;
-      line-height: 1.4;
-      word-break: keep-all;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9em;
+    }
+    .btn-del-photo {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #ffffff;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75em;
+      opacity: 0;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .gallery-card:hover .btn-del-photo {
+      opacity: 1;
+    }
+    .btn-del-photo:hover {
+      background: #e03131;
+    }
+
+    /* 이미지 원본 확대 뷰어 라이트박스 */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 20000;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      cursor: default;
     }
 
     .fc .fc-daygrid-day-top {
@@ -509,7 +716,6 @@
       white-space: nowrap !important;
       flex-shrink: 0 !important;
     }
-
     .day-pin-badge {
       display: inline-flex;
       align-items: center;
@@ -523,12 +729,8 @@
       border-radius: 10px;
       line-height: 1.2;
     }
-
     .fc-day-sun .fc-daygrid-day-number,
-    .holiday-date .fc-daygrid-day-number,
-    .holiday-date a.fc-daygrid-day-number,
-    .fc .holiday-date .fc-daygrid-day-top a,
-    .fc-daygrid-day.holiday-date .fc-daygrid-day-number {
+    .holiday-date .fc-daygrid-day-number {
       color: #e03131 !important;
       font-weight: bold !important;
     }
@@ -537,7 +739,7 @@
       font-weight: bold;
     }
 
-    /* 모달 */
+    /* 기본 모달 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -553,8 +755,6 @@
       border-radius: 12px;
       width: 320px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-      position: relative;
-      z-index: 10001;
       box-sizing: border-box;
     }
     .modal-box h4 { margin: 0 0 14px 0; font-size: 1.05em; }
@@ -591,8 +791,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .btn-delete:hover { background: #ffc9c9; }
-
     .schedule-category-select {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -608,7 +806,6 @@
       font-size: 0.84em;
       font-weight: 700;
       text-align: center;
-      transition: all 0.1s;
     }
     .cat-btn.active {
       background: #ffffff;
@@ -616,7 +813,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.08);
       transform: translateY(-1px);
     }
-
     .schedule-input {
       width: 100%;
       padding: 10px 12px;
@@ -626,10 +822,6 @@
       margin-bottom: 12px;
       font-size: 0.92em;
       outline: none;
-    }
-    .schedule-input:focus {
-      border-color: #7950f2;
-      box-shadow: 0 0 0 3px rgba(121, 80, 242, 0.15);
     }
     .btn-submit {
       width: 100%;
@@ -641,28 +833,14 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .btn-submit:hover { background: #6741d9; }
 
     @media (max-width: 1024px) {
       body { padding: 12px; }
-      .main-container { max-width: 100%; }
-      .top-banner {
-        height: auto;
-        min-height: 120px;
-        padding: 20px 16px;
-        background-size: cover;
-      }
-      .top-banner h1 { font-size: 1.25em; }
-      .top-banner p { font-size: 0.8em; }
-      .notice-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .dday-wrapper { width: 100%; justify-content: flex-start; padding-top: 4px; border-top: 1px dashed #edf0f2; }
       .app-layout { flex-direction: column; }
-      .calendar-wrapper { order: 1; width: 100%; box-sizing: border-box; padding: 12px; }
-      .status-panel { order: 2; width: 100%; }
-      .sidebar { order: 3; width: 100%; box-sizing: border-box; }
-      .fc .fc-toolbar { flex-direction: column; gap: 8px; }
-      .fc .fc-toolbar-title { font-size: 1.2em; }
-      .fc .fc-daygrid-day-frame { min-height: 85px !important; }
+      .calendar-wrapper { order: 1; width: 100%; }
+      .right-sidebar { order: 2; width: 100%; }
+      .sidebar { order: 3; width: 100%; }
+      .gallery-modal-box { width: 95%; max-height: 90vh; }
     }
   </style>
 </head>
@@ -686,25 +864,19 @@
     <div class="app-layout">
       <!-- 1. 좌측 사이드바 -->
       <div class="sidebar">
-<div class="weekly-download-card">
+        <div class="weekly-download-card">
           <p style="margin: 0 0 10px 0; font-size: 0.88em; color: #343a40; font-weight: 700; border-bottom: 1px dashed #dee2e6; padding-bottom: 6px;">
             📄 주요 업무 양식
           </p>
-          
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <!-- 1번 양식 (기존 주간업무) -->
             <a href="weekly_form.hwp" download id="downloadBtn1" class="btn-download-weekly">
               <span>📥 주간업무양식</span>
               <span id="badgeFile1" class="new-badge" style="display: none;">NEW</span>
             </a>
-
-            <!-- 2번 양식 -->
             <a href="monthly_1.hwp" download id="downloadBtn2" class="btn-download-weekly" style="background: #3b5bdb;">
               <span>📥 학생월간양식</span>
               <span id="badgeFile2" class="new-badge" style="display: none;">NEW</span>
             </a>
-
-            <!-- 3번 양식 -->
             <a href="monthly_2.hwp" download id="downloadBtn3" class="btn-download-weekly" style="background: #20c997;">
               <span>📥 창업월간양식</span>
               <span id="badgeFile3" class="new-badge" style="display: none;">NEW</span>
@@ -771,65 +943,124 @@
         <div id="calendar"></div>
       </div>
 
-      <!-- 3. 우측 실시간 인원 현황판 -->
-      <div class="status-panel">
-        <div class="status-header">
-          <h3>📊 인원 현황</h3>
+      <!-- 3. 우측 사이드 패널 (인원 현황판 + 익명 실시간 채팅 + 갤러리 버튼) -->
+      <div class="right-sidebar">
+        <!-- 인원 현황판 -->
+        <div class="status-panel">
+          <div class="status-header">
+            <h3>📊 인원 현황</h3>
+          </div>
+
+          <div class="status-target-date" id="statusTargetDate">일정 계산 중...</div>
+
+          <div class="present-card">
+            <div class="label">🏢 현재 재실(근무) 인원</div>
+            <div class="count" id="presentCount">--명</div>
+            <div class="total" id="totalMemberCount">부서 총원: 20명</div>
+          </div>
+
+          <div class="status-detail-list">
+            <div class="status-detail-item">
+              <div class="status-detail-top">
+                <span class="badge-tag" style="background: #1c7ed6;">연차</span>
+                <span class="count-text" id="count-연차">0명</span>
+              </div>
+              <div class="status-members" id="members-연차">-</div>
+            </div>
+
+            <div class="status-detail-item">
+              <div class="status-detail-top">
+                <span class="badge-tag" style="background: #2f9e44;">오전반차</span>
+                <span class="count-text" id="count-오전반차">0명</span>
+              </div>
+              <div class="status-members" id="members-오전반차">-</div>
+            </div>
+
+            <div class="status-detail-item">
+              <div class="status-detail-top">
+                <span class="badge-tag" style="background: #f76707;">오후반차</span>
+                <span class="count-text" id="count-오후반차">0명</span>
+              </div>
+              <div class="status-members" id="members-오후반차">-</div>
+            </div>
+
+            <div class="status-detail-item">
+              <div class="status-detail-top">
+                <span class="badge-tag" style="background: #748ffc;">외출/조퇴</span>
+                <span class="count-text" id="count-외출/조퇴">0명</span>
+              </div>
+              <div class="status-members" id="members-외출/조퇴">-</div>
+            </div>
+
+            <div class="status-detail-item">
+              <div class="status-detail-top">
+                <span class="badge-tag" style="background: #495057;">출장</span>
+                <span class="count-text" id="count-출장">0명</span>
+              </div>
+              <div class="status-members" id="members-출장">-</div>
+            </div>
+          </div>
         </div>
 
-        <div class="status-target-date" id="statusTargetDate">
-          일정 계산 중...
+        <!-- 가가라이브 스타일 익명 채팅 위젯 -->
+        <div class="chat-panel">
+          <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span>💬 익명 한줄 톡</span>
+              <button type="button" class="btn-clear-chat" onclick="openClearChatModal()" title="채팅 전체 비우기">🧹</button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="chat-nick-badge" id="myNickDisplay" title="클릭해서 닉네임 변경">익명</span>
+              <div id="nickEditBox" style="display: none; align-items: center; gap: 3px;">
+                <input type="text" id="customNickInput" style="width: 75px; font-size: 0.75em; padding: 2px 4px; border-radius: 4px; border: 1px solid #ffd43b; outline: none;" maxlength="10">
+                <button type="button" id="saveNickBtn" style="background: #ffd43b; color: #212529; border: none; font-size: 0.7em; font-weight: bold; border-radius: 4px; padding: 2px 5px; cursor: pointer;">확인</button>
+                <button type="button" id="cancelNickBtn" style="background: #495057; color: #fff; border: none; font-size: 0.7em; border-radius: 4px; padding: 2px 5px; cursor: pointer;">취소</button>
+              </div>
+            </div>
+          </div>
+          <div class="chat-body" id="chatMessages">
+            <div style="color: #adb5bd; text-align: center; margin-top: 10px;">채팅 서버에 연결 중...</div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" class="chat-input" placeholder="메시지 입력..." maxlength="100" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">전송</button>
+          </div>
         </div>
 
-        <div class="present-card">
-          <div class="label">🏢 현재 재실(근무) 인원</div>
-          <div class="count" id="presentCount">--명</div>
-          <div class="total" id="totalMemberCount">부서 총원: 20명</div>
-        </div>
+        <!-- 📷 갤러리 열기 버튼 (채팅창 바로 아래 배치) -->
+        <button type="button" class="btn-open-gallery" onclick="openGalleryModal()">
+          <span>📷 부서 사진첩 열기</span>
+          <span id="galleryCountBadge" style="background: rgba(255,255,255,0.25); padding: 2px 7px; border-radius: 10px; font-size: 0.85em;">0</span>
+        </button>
 
-        <div class="status-detail-list">
-          <div class="status-detail-item">
-            <div class="status-detail-top">
-              <span class="badge-tag" style="background: #1c7ed6;">연차</span>
-              <span class="count-text" id="count-연차">0명</span>
-            </div>
-            <div class="status-members" id="members-연차">-</div>
-          </div>
+      </div> <!-- /.right-sidebar -->
+    </div> <!-- /.app-layout -->
+  </div> <!-- /.main-container -->
 
-          <div class="status-detail-item">
-            <div class="status-detail-top">
-              <span class="badge-tag" style="background: #2f9e44;">오전반차</span>
-              <span class="count-text" id="count-오전반차">0명</span>
-            </div>
-            <div class="status-members" id="members-오전반차">-</div>
-          </div>
+  <!-- ================= 모달 영역 ================= -->
 
-          <div class="status-detail-item">
-            <div class="status-detail-top">
-              <span class="badge-tag" style="background: #f76707;">오후반차</span>
-              <span class="count-text" id="count-오후반차">0명</span>
-            </div>
-            <div class="status-members" id="members-오후반차">-</div>
-          </div>
-
-          <div class="status-detail-item">
-            <div class="status-detail-top">
-              <span class="badge-tag" style="background: #748ffc;">외출/조퇴</span>
-              <span class="count-text" id="count-외출/조퇴">0명</span>
-            </div>
-            <div class="status-members" id="members-외출/조퇴">-</div>
-          </div>
-
-          <div class="status-detail-item">
-            <div class="status-detail-top">
-              <span class="badge-tag" style="background: #495057;">출장</span>
-              <span class="count-text" id="count-출장">0명</span>
-            </div>
-            <div class="status-members" id="members-출장">-</div>
-          </div>
+  <!-- 📷 부서 갤러리 대형 모달 -->
+  <div class="modal-overlay" id="galleryModal">
+    <div class="gallery-modal-box" onclick="event.stopPropagation()">
+      <div class="gallery-top-bar">
+        <h3>📷 부서 사진첩 <span id="gallerySubCount" style="font-size: 0.75em; color: #7950f2; font-weight: 700;">(0장)</span></h3>
+        <div class="gallery-actions">
+          <input type="file" id="galleryFileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+          <button type="button" class="btn-upload-pic" onclick="document.getElementById('galleryFileInput').click()">
+            <span>➕ 사진 올리기</span>
+          </button>
+          <button type="button" class="btn-close" style="margin-top: 0; width: auto; padding: 8px 12px;" onclick="closeModal('galleryModal')">닫기</button>
         </div>
       </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <div style="grid-column: 1/-1; text-align: center; color: #adb5bd; padding: 40px 0;">사진을 불러오는 중입니다...</div>
+      </div>
     </div>
+  </div>
+
+  <!-- 이미지 확대보기 라이트박스 -->
+  <div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="확대 이미지" onclick="event.stopPropagation()">
   </div>
 
   <!-- 연차 등록 모달 -->
@@ -868,14 +1099,12 @@
   <div class="modal-overlay" id="scheduleModal">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h4 id="scheduleModalDate">📌 주요 일정 등록</h4>
-      
       <div class="schedule-category-select">
         <button type="button" class="cat-btn active" data-cat="행사" style="color: #5f3dc4;" onclick="selectCategory('행사')">🎉 부서행사/회식</button>
         <button type="button" class="cat-btn" data-cat="회의" style="color: #3b5bdb;" onclick="selectCategory('회의')">💬 부서회의</button>
         <button type="button" class="cat-btn" data-cat="마감" style="color: #e03131;" onclick="selectCategory('마감')">⏰ 마감/공문</button>
         <button type="button" class="cat-btn" data-cat="학사" style="color: #2b8a3e;" onclick="selectCategory('학사')">🏫 학사/교내</button>
       </div>
-
       <input type="text" id="scheduleContentInput" class="schedule-input" placeholder="예: 10/1 축제 부스 운영" onkeydown="if(event.key==='Enter') submitSchedule()">
       <button class="btn-submit" onclick="submitSchedule()">등록하기</button>
       <button class="btn-close" onclick="closeModal('scheduleModal')">취소</button>
@@ -892,13 +1121,374 @@
     </div>
   </div>
 
+  <!-- 채팅 전체 초기화 모달 -->
+  <div class="modal-overlay" id="clearChatModal">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h4 style="margin: 0 0 10px 0; color: #e03131;">🧹 대화 전체 초기화</h4>
+      <p style="font-size: 0.84em; color: #495057; margin-bottom: 12px;">관리 비밀번호를 입력하면 모든 대화가 삭제됩니다.</p>
+      <input type="password" id="clearChatPassword" class="schedule-input" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter') executeClearChat()">
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn-delete" style="margin-top: 0; flex: 1;" onclick="executeClearChat()">전체 삭제</button>
+        <button type="button" class="btn-close" style="margin-top: 0; flex: 1;" onclick="closeModal('clearChatModal')">취소</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // ==========================================
+    // 1. Firebase 실시간 익명 채팅 및 갤러리 설정
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAtXfbALGVePjDXEMnL6Qk0bfuC2cYxHr4",
+      authDomain: "dept-calendar-6bad9.firebaseapp.com",
+      databaseURL: "https://dept-calendar-6bad9-default-rtdb.firebaseio.com",
+      projectId: "dept-calendar-6bad9",
+      storageBucket: "dept-calendar-6bad9.firebasestorage.app",
+      messagingSenderId: "150744998031",
+      appId: "1:150744998031:web:c4eab616996a9a6d0610fa"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+    const chatRef = db.ref('anonymous_chat');
+    const galleryRef = db.ref('department_gallery'); // 📷 갤러리용 DB 레퍼런스
+
+    // [닉네임 관리]
+    const animalNames = ['다람쥐', '토끼', '호랑이', '사자', '판다', '고양이', '강아지', '수달', '너구리', '곰', '여우'];
+    function getStoredNickname() {
+      let nick = localStorage.getItem('anon_nickname');
+      if (!nick) {
+        const randomAnimal = animalNames[Math.floor(Math.random() * animalNames.length)];
+        const randomNum = Math.floor(Math.random() * 90) + 10;
+        nick = `익명_${randomAnimal}${randomNum}`;
+        localStorage.setItem('anon_nickname', nick);
+      }
+      return nick;
+    }
+
+    let myNickname = getStoredNickname();
+
+    function renderMyNickBadge() {
+      const badge = document.getElementById('myNickDisplay');
+      if (badge) badge.innerText = myNickname;
+    }
+
+    function setupNicknameControls() {
+      const badge = document.getElementById('myNickDisplay');
+      const editBox = document.getElementById('nickEditBox');
+      const input = document.getElementById('customNickInput');
+      const saveBtn = document.getElementById('saveNickBtn');
+      const cancelBtn = document.getElementById('cancelNickBtn');
+
+      if (!badge || !editBox) return;
+      renderMyNickBadge();
+
+      badge.onclick = function() {
+        badge.style.display = 'none';
+        editBox.style.display = 'flex';
+        input.value = myNickname;
+        input.focus();
+        input.select();
+      };
+
+      function saveNickname() {
+        const val = input.value.trim();
+        if (val) {
+          myNickname = val.substring(0, 10);
+          localStorage.setItem('anon_nickname', myNickname);
+          renderMyNickBadge();
+        }
+        editBox.style.display = 'none';
+        badge.style.display = 'inline-block';
+      }
+
+      saveBtn.onclick = saveNickname;
+
+      input.onkeydown = function(e) {
+        if (e.key === 'Enter') saveNickname();
+        if (e.key === 'Escape') {
+          editBox.style.display = 'none';
+          badge.style.display = 'inline-block';
+        }
+      };
+
+      cancelBtn.onclick = function() {
+        editBox.style.display = 'none';
+        badge.style.display = 'inline-block';
+      };
+    }
+
+    // [채팅 전송]
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      chatRef.push({
+        nick: myNickname,
+        text: text,
+        time: timeStr,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      input.value = '';
+    }
+
+    // [채팅 리스너]
+    function initChatListener() {
+      const chatBox = document.getElementById('chatMessages');
+      renderMyNickBadge();
+
+      chatRef.limitToLast(50).on('value', snapshot => {
+        chatBox.innerHTML = '';
+        const data = snapshot.val();
+        if (!data) {
+          chatBox.innerHTML = '<div style="color: #adb5bd; text-align: center; margin-top: 10px;">아직 대화가 없습니다. 첫마디를 남겨보세요!</div>';
+          return;
+        }
+
+        snapshot.forEach(child => {
+          const key = child.key;
+          const msg = child.val();
+          const isMe = (msg.nick === myNickname);
+
+          const msgEl = document.createElement('div');
+          msgEl.className = `chat-msg ${isMe ? 'is-me' : ''}`;
+          
+          const cleanText = msg.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          msgEl.innerHTML = `
+            <span class="nick">${msg.nick}:</span>
+            <span class="text">${cleanText}</span>
+            <span class="time">${msg.time || ''}</span>
+            <button type="button" class="btn-del-msg" onclick="deleteSingleMessage('${key}')" title="이 메시지 삭제">✕</button>
+          `;
+          chatBox.appendChild(msgEl);
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+
+    function deleteSingleMessage(key) {
+      if (confirm("이 메시지를 삭제할까?")) {
+        chatRef.child(key).remove().catch(err => {
+          alert("삭제 실패: " + err.message);
+        });
+      }
+    }
+
+    function openClearChatModal() {
+      const modal = document.getElementById('clearChatModal');
+      const input = document.getElementById('clearChatPassword');
+      if (modal && input) {
+        input.value = '';
+        modal.style.display = 'flex';
+        setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    function executeClearChat() {
+      const input = document.getElementById('clearChatPassword');
+      const enteredPass = input.value.trim();
+
+      if (enteredPass === "2543") {
+        chatRef.remove()
+          .then(() => {
+            closeModal('clearChatModal');
+            alert("채팅방이 깨끗하게 정리되었어!");
+          })
+          .catch(err => {
+            alert("초기화 실패: " + err.message);
+          });
+      } else {
+        alert("비밀번호가 일치하지 않아.");
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    // ==========================================
+    // 📷 [신규] 초경량 갤러리 로직 (Realtime DB 직결)
+    // ==========================================
+    function openGalleryModal() {
+      document.getElementById('galleryModal').style.display = 'flex';
+    }
+
+// 이미지 파일 선택 시 브라우저 Canvas로 가로 최대 800px 압축 후 DB 업로드
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // 이미지 파일인지 체크
+      if (!file.type.startsWith('image/')) {
+        alert("이미지 파일만 등록할 수 있어!");
+        e.target.value = '';
+        return;
+      }
+
+      const grid = document.getElementById('galleryGrid');
+      // 업로드 진행 중임을 화면에 표시
+      const loadingEl = document.createElement('div');
+      loadingEl.id = 'galleryUploadingNotice';
+      loadingEl.style.cssText = 'grid-column: 1/-1; text-align: center; color: #7950f2; font-weight: bold; padding: 20px;';
+      loadingEl.innerText = '⏳ 사진 최적화 및 등록 중입니다...';
+      grid.prepend(loadingEl);
+
+      const reader = new FileReader();
+      reader.onerror = function() {
+        alert("파일을 읽는 중 문제가 발생했어.");
+        if (loadingEl) loadingEl.remove();
+        e.target.value = '';
+      };
+
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onerror = function() {
+          alert("이미지 데이터를 변환하지 못했어. (지원하지 않는 형식이거나 파일이 손상되었을 수 있어)");
+          if (loadingEl) loadingEl.remove();
+          e.target.value = '';
+        };
+
+        img.onload = function() {
+          try {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // 가로 기준 최대 800px로 제한 (용량 극대화 절약)
+            const MAX_WIDTH = 800;
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // JPEG 품질 0.65로 압축 (50~100KB대로 확실하게 줄임)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+
+            galleryRef.push({
+              imgData: compressedDataUrl,
+              memo: "부서 사진",
+              uploader: myNickname,
+              date: dateStr,
+              timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+              if (loadingEl) loadingEl.remove();
+              e.target.value = ''; // 초기화
+            }).catch(err => {
+              alert("Firebase 저장 실패: " + err.message);
+              if (loadingEl) loadingEl.remove();
+              e.target.value = '';
+            });
+
+          } catch (err) {
+            alert("압축 처리 중 에러: " + err.message);
+            if (loadingEl) loadingEl.remove();
+            e.target.value = '';
+          }
+        };
+
+        img.src = event.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // 실시간 갤러리 리스너
+    function initGalleryListener() {
+      galleryRef.on('value', snapshot => {
+        const grid = document.getElementById('galleryGrid');
+        const badge = document.getElementById('galleryCountBadge');
+        const subCount = document.getElementById('gallerySubCount');
+        
+        grid.innerHTML = '';
+        const data = snapshot.val();
+
+        if (!data) {
+          if (badge) badge.innerText = "0";
+          if (subCount) subCount.innerText = "(0장)";
+          grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #adb5bd; padding: 40px 0;">아직 등록된 사진이 없습니다. 첫 사진을 올려보세요!</div>';
+          return;
+        }
+
+        const items = [];
+        snapshot.forEach(child => {
+          items.push({ key: child.key, ...child.val() });
+        });
+
+        // 최신 사진이 맨 앞에 오도록 역순 정렬
+        items.reverse();
+
+        if (badge) badge.innerText = items.length;
+        if (subCount) subCount.innerText = `(${items.length}장)`;
+
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'gallery-card';
+
+          const memoText = item.memo ? item.memo.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '부서 일상';
+
+          card.innerHTML = `
+            <button type="button" class="btn-del-photo" onclick="deleteGalleryPhoto('${item.key}')" title="사진 삭제">✕</button>
+            <div class="gallery-img-wrap" onclick="openLightbox('${item.imgData}')">
+              <img src="${item.imgData}" alt="${memoText}">
+            </div>
+            <div class="gallery-info">
+              <span class="gallery-memo" title="${memoText}">${memoText}</span>
+              <div class="gallery-meta">
+                <span>${item.uploader || '익명'}</span>
+                <span>${item.date || ''}</span>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      });
+    }
+
+    function deleteGalleryPhoto(key) {
+      if (confirm("이 사진을 삭제할까?")) {
+        galleryRef.child(key).remove().catch(err => {
+          alert("삭제 실패: " + err.message);
+        });
+      }
+    }
+
+    // 사진 원본 크게보기 (라이트박스)
+    function openLightbox(src) {
+      const overlay = document.getElementById('lightboxOverlay');
+      const img = document.getElementById('lightboxImg');
+      img.src = src;
+      overlay.style.display = 'flex';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxOverlay').style.display = 'none';
+      document.getElementById('lightboxImg').src = '';
+    }
+
+    // ==========================================
+    // 2. 기존 부서 캘린더 & Google Apps Script 로직
+    // ==========================================
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxgq0vmTmYHn3FQihVHCt_DYoEXOXHxsYIiEv68lpDekOpRswzYPpsFw1bbvxqfHroE0w/exec";
 
     const FILE_VERSIONS = {
-      file1: "2026-10-12", // 주간업무 양식
-      file2: "2026-09-29", // 학생처 월간
-      file3: "2026-09-29"  // 창업 월간
+      file1: "2026-10-12",
+      file2: "2026-09-29",
+      file3: "2026-09-29"
     };
 
     const holidays = new Set([
@@ -976,8 +1566,7 @@
       });
     }
 
-function checkWeeklyFormVersion() {
-      // 3개 버튼과 뱃지를 매핑하여 처리
+    function checkWeeklyFormVersion() {
       const downloadList = [
         { id: 'file1', btn: 'downloadBtn1', badge: 'badgeFile1' },
         { id: 'file2', btn: 'downloadBtn2', badge: 'badgeFile2' },
@@ -992,20 +1581,19 @@ function checkWeeklyFormVersion() {
         const currentVer = FILE_VERSIONS[item.id];
         const lastSeenVer = localStorage.getItem(`last_downloaded_${item.id}`);
 
-        // 버전이 다르면 NEW 뱃지 표시
         if (lastSeenVer !== currentVer) {
           badgeEl.style.display = 'inline-block';
         } else {
           badgeEl.style.display = 'none';
         }
 
-        // 클릭 시 해당 파일의 NEW 뱃지만 사라짐
         btnEl.addEventListener('click', function() {
           localStorage.setItem(`last_downloaded_${item.id}`, currentVer);
           badgeEl.style.display = 'none';
         });
       });
     }
+
     function renderDDayBadges() {
       const container = document.getElementById('ddayContainer');
       container.innerHTML = '';
@@ -1133,6 +1721,16 @@ function checkWeeklyFormVersion() {
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+      // 1. Firebase 실시간 채팅 & 갤러리 리스너 시작
+      try {
+        setupNicknameControls();
+        initChatListener();
+        initGalleryListener(); // 📷 갤러리 리스너 연동
+      } catch (e) {
+        console.error("Firebase 초기화 에러:", e);
+      }
+
+      // 2. 부서 캘린더 시작
       const containerEl = document.getElementById('external-events');
       const calendarEl = document.getElementById('calendar');
 
@@ -1143,7 +1741,7 @@ function checkWeeklyFormVersion() {
       checkWeeklyFormVersion();
 
       containerEl.querySelectorAll('.member-item').forEach(el => {
-        el.addEventListener('click', function(e) {
+        el.addEventListener('click', function() {
           const name = this.getAttribute('data-name');
           togglePersonFilter(name);
         });
@@ -1512,7 +2110,7 @@ function checkWeeklyFormVersion() {
       setTimeout(applyCurrentFilterUI, 50);
     }
 
-function submitSchedule() {
+    function submitSchedule() {
       const inputEl = document.getElementById('scheduleContentInput');
       const text = inputEl.value.trim();
       if (!text) {
@@ -1530,10 +2128,8 @@ function submitSchedule() {
         content: rawContent
       };
 
-      // 1. 모달 닫기
       closeModal('scheduleModal');
 
-      // 2. 구글 시트로 전송 후 최신 서버 데이터로 딱 1회 깔끔하게 갱신
       fetch(GAS_URL, {
         method: "POST",
         mode: "no-cors",
@@ -1547,6 +2143,7 @@ function submitSchedule() {
         alert("구글 시트 연동 실패: " + err);
       });
     }
+
     function deleteSchedule() {
       if (!selectedScheduleToDelete) return;
 
